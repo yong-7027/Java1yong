@@ -11,7 +11,7 @@ public class MovieUtils {
     public static Movie queryMovie(ArrayList<CustomerMovie> movies, String mvName){
         for (int i = 0; i < movies.size(); i++) {
             Movie movie = movies.get(i);
-            String name = movie.getMvName().toUpperCase();
+            String name = movie.getMvName().getName().toUpperCase();
 
             if (name.equals(mvName)) {
                 return movie;

@@ -51,7 +51,7 @@ public class TimeTable {
         do {
             try {
                 System.out.print("\nSelect the cinema you want to view the schedule: ");
-                cinemas = Cinema.viewCinemaList();
+                cinemas = Cinema.viewCinemaList(1);
                 System.out.print("\nEnter the cinema no: ");
                 cinemaNo = sc.nextInt();
                 sc.nextLine();
@@ -76,7 +76,7 @@ public class TimeTable {
         do {
             try {
                 System.out.println("\nSelect the hall: ");
-                halls = Cinema.viewHallList(cinemas.get(cinemaNo - 1).getCinemaID());
+                halls = cinemas.get(cinemaNo - 1).viewHallList(1);
                 System.out.print("\nEnter the hall no: ");
                 hallNo = sc.nextInt();
                 sc.nextLine();
@@ -130,8 +130,8 @@ public class TimeTable {
 
         ResultSet result = null;
         try {
-            Object[] params2 = {halls.get(hallNo - 1).getHallID(), date};
-            result = DatabaseUtils.selectQueryById("*", "timeTable", "hall_id = ? AND movie_showDate = ?", params2);
+            Object[] params2 = {halls.get(hallNo - 1).getHallID(), date, 1};
+            result = DatabaseUtils.selectQueryById("*", "timeTable", "hall_id = ? AND movie_showDate = ? AND timeTable_status = ?", params2);
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -156,7 +156,7 @@ public class TimeTable {
             while (result2.next()) {
                 movie.setMovieID(result2.getInt("movie_id"));
                 movie.setGenreID(result2.getInt("genre_id"));
-                movie.setMvName(new Name(result.getString("mv_name")));
+                movie.setMvName(new Name(result2.getString("mv_name")));
                 movie.setReleaseDate(new ShowDate(result2.getDate("release_date").toLocalDate()));
                 movie.setDuration(result2.getInt("duration"));
                 movie.setLang(result2.getString("lang"));
@@ -193,7 +193,7 @@ public class TimeTable {
         if (!schedules.isEmpty()) {
             System.out.printf("%-30s %15s %15s\n", "Movie Name", "Start Time", "End Time");
             for (int i = 0; i < schedules.size(); i++) {
-                System.out.printf((i + 1) + ". %-20s %17s %17s\n", schedules.get(i).movie.getMvName(), schedules.get(i).startTime, schedules.get(i).endTime);
+                System.out.printf((i + 1) + ". %-20s %17s %17s\n", schedules.get(i).movie.getMvName().getName(), schedules.get(i).startTime, schedules.get(i).endTime);
             }
         }
         else {

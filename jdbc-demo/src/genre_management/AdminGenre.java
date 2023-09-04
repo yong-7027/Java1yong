@@ -1,6 +1,7 @@
 package genre_management;
 
 import Connect.DatabaseUtils;
+import Driver.Name;
 import movie_management.AdminMovie;
 import movie_management.Movie;
 import movie_management.MovieUtils;
@@ -19,7 +20,7 @@ public class AdminGenre extends Genre{
     private AdminGenre(){
     }
 
-    private AdminGenre(int genreID, String genreName, int post) {
+    private AdminGenre(int genreID, Name genreName, int post) {
         super(genreID, genreName, post); // Call the constructor of the parent class
     }
 
@@ -31,7 +32,7 @@ public class AdminGenre extends Genre{
             ResultSet result = DatabaseUtils.selectQueryById("*", "genre", null, null);
 
             while (result.next()) {
-                AdminGenre genre = new AdminGenre(result.getInt("genre_id"), result.getString("genre_name"), result.getInt("post"));
+                AdminGenre genre = new AdminGenre(result.getInt("genre_id"), new Name(result.getString("genre_name")), result.getInt("post"));
                 genres.add(genre);
             }
 
@@ -70,14 +71,14 @@ public class AdminGenre extends Genre{
                         }
                         break;
                     case 1:
-                        Genre.viewGenreDetails(genres);
+                        //Genre.viewGenreDetails(genres);
                         System.out.println("\nPress any key to back...");
                         sc.nextLine();
                         break;
                     case 2:
                         do {
                             AdminGenre newGenre = new AdminGenre();
-                            newGenre.addGenre(sc);
+                            newGenre.addGenre();
                             String addGenre;
                             do {
                                 System.out.println("\nDo you want add another new genre? (Y / N)");
@@ -99,7 +100,7 @@ public class AdminGenre extends Genre{
                         do {
                             try {
                                 System.out.println("\nSelect the genre you want to modify: ");
-                                Genre.viewGenreDetails(genres);
+                                //Genre.viewGenreDetails(genres);
                                 System.out.print("\nEnter the genre no (0 - Back): ");
                                 int choice1 = sc.nextInt();
                                 sc.nextLine();
@@ -107,7 +108,7 @@ public class AdminGenre extends Genre{
                                 if (choice1 >= 0 && choice1 <= genres.size()) {
                                     if (choice1 != 0) {
                                         AdminGenre targetGenre = genres.get(choice1 - 1);
-                                        continues = targetGenre.modifyGenre(sc);
+                                        //continues = targetGenre.modifyGenre(sc);
                                     } else {
                                         continues = false;
                                     }
@@ -127,7 +128,7 @@ public class AdminGenre extends Genre{
                         do {
                             try {
                                 System.out.println("\nSelect the genre you want to delete: ");
-                                Genre.viewGenreDetails(genres);
+                                //Genre.viewGenreDetails(genres);
                                 System.out.print("\nEnter the genre no (0 - Back): ");
                                 int choice2 = sc.nextInt();
                                 sc.nextLine();
@@ -138,7 +139,7 @@ public class AdminGenre extends Genre{
 
                                         if (post == 0) {
                                             AdminGenre targetGenre = genres.get(choice2 - 1);
-                                            continues = targetGenre.deleteGenre(sc);
+                                            //continues = targetGenre.deleteGenre();
                                         }
                                         else {
                                             System.out.println("Sorry, you cannot delete this genre. Please make sure there are no movie posts in this genre!");
@@ -172,7 +173,7 @@ public class AdminGenre extends Genre{
         } while (exit.equals("N"));
     }
 
-    private void addGenre(Scanner sc) throws Exception{
+    /*private void addGenre(Scanner sc) throws Exception{
         // Genre Name
         do {
             System.out.print("\nEnter genre name: ");
@@ -200,9 +201,9 @@ public class AdminGenre extends Genre{
         else {
             System.out.println("\nSomething went wrong!");
         }
-    }
+    }*/
 
-    private boolean modifyGenre(Scanner sc) throws Exception {
+    /*private boolean modifyGenre(Scanner sc) throws Exception {
         do {
             System.out.print("\nEnter the new genre name (0 - Back): ");
             String editGenreName = sc.nextLine();
@@ -261,9 +262,9 @@ public class AdminGenre extends Genre{
         else {
             return false;
         }
-    }
+    }*/
 
-    private boolean deleteGenre(Scanner sc) throws Exception{
+    /*private boolean deleteGenre(Scanner sc) throws Exception{
         String delete;
         do {
             System.out.println("\nAre you sure you want to delete this genre? (Y / N)");
@@ -276,7 +277,7 @@ public class AdminGenre extends Genre{
 
         if (delete.equals("Y")) {
             Object[] params = {getGenreID()};
-            int rowAffected = DatabaseUtils.deleteQueryById("genre", "genre_id", params);
+            int rowAffected = DatabaseUtils.deleteQueryById("genre", "genre_status", "genre_id", params);
             if (rowAffected > 0) {
                 System.out.println("\nThis genre has been deleted.");
             }
@@ -304,5 +305,5 @@ public class AdminGenre extends Genre{
         else {
             return false;
         }
-    }
+    }*/
 }

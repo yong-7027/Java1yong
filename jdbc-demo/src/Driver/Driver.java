@@ -1,6 +1,7 @@
 package Driver;
 
 import cinema_management.Cinema;
+import hall_management.Hall;
 import timetable_management.AdminTimeTable;
 
 import java.util.ArrayList;
@@ -14,18 +15,23 @@ public class Driver {
         //CustomerMovie.customer(sc);
         //AdminMovie.adminMovie(sc);
         //AdminGenre.adminGenre(sc);
-        //AdminTimeTable.adminTimeTable(sc);
+        AdminTimeTable.adminTimeTable(sc);
 
         System.out.println("Select the operation:");
         System.out.println("1. Manage Cinema");
         System.out.println("2. Manage Hall");
+        System.out.println("3. Manage Movie");
+        System.out.println("4. Manage Genre");
         System.out.print("\nEnter your selection: ");
 
         int choice = sc.nextInt();
         sc.nextLine();
 
+        SystemClass system = null;
         switch (choice) {
             case 1:
+                system = new SystemClass();
+                system.manageCinema(sc);
                 break;
             case 2:
                 ArrayList<Cinema> cinemas = Cinema.getCinemas();
@@ -54,9 +60,17 @@ public class Driver {
                     }
 
                     Cinema cinema = cinemas.get(cinemaSelected - 1);
-                    SystemClass system = new SystemClass(cinema);
+                    system = new SystemClass(cinema);
                     system.manageHall(sc);
                 } while (error);
+                break;
+            case 3:
+                system = new SystemClass();
+                system.manageMovie(sc);
+                break;
+            case 4:
+                system = new SystemClass();
+                system.manageGenre(sc);
                 break;
         }
     }

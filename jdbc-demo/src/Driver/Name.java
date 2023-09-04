@@ -16,6 +16,7 @@ public class Name {
 
     public void capitalizeWords(){
         StringBuilder result = new StringBuilder();
+        name = name.trim();
         String[] words = name.split(" ");
 
         for (String word : words) {
@@ -44,7 +45,7 @@ public class Name {
         }
     }
 
-    private boolean checkDuplicateName(ResultSet result, String searchThing) throws Exception{
+    private boolean checkDuplicateName(ResultSet result, String searchThing) throws Exception {
         try {
             while (result.next()) {
                 String name = result.getString(searchThing);

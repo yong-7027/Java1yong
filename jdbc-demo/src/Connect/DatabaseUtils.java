@@ -79,11 +79,11 @@ public class DatabaseUtils {
         }
     }
 
-    public static int deleteQueryById(String tableName, String idColumn, Object... params) throws SQLException {
+    public static int deleteQueryById(String tableName, String statusColumnName, String idColumn, Object... params) throws SQLException {
         try {
             Connection conn = getConnection();
 
-            String sql = "DELETE FROM " + tableName + " WHERE " + idColumn + " = ?";
+            String sql = "UPDATE " + tableName + " SET " + statusColumnName + " = 0 WHERE " + idColumn + " = ?";
 
             PreparedStatement stmt = conn.prepareStatement(sql);
 

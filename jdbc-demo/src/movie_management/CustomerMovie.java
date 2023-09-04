@@ -1,6 +1,8 @@
 package movie_management;
 
 import Connect.DatabaseUtils;
+import Driver.Name;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class CustomerMovie extends Movie{
 
                 movie.setMovieID(result.getInt("movie_id"));
                 movie.setGenreID(result.getInt("genre_id"));
-                movie.setMvName(result.getString("mv_name"));
+                movie.setMvName(new Name(result.getString("mv_name")));
                 movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
                 movie.setDuration(result.getInt("duration"));
                 movie.setLang(result.getString("lang"));
@@ -57,11 +59,11 @@ public class CustomerMovie extends Movie{
                         status1 = false;
                         break;
                     case 2:
-                        status1 = false;
-                        int choice2 = Movie.viewMovieList(movies, sc);
-                        if (choice2 != 0) {
-                            movies.get(choice2 - 1).movieDetail();
-                        }
+                        //status1 = false;
+                        //int choice2 = Movie.viewMovieList(movies, sc);
+                        //if (choice2 != 0) {
+                          //  movies.get(choice2 - 1).movieDetail();
+                        //}
                         break;
                     case 3:
                         status1 = false;

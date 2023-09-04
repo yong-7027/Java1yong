@@ -475,23 +475,20 @@ public class AdminTimeTable extends TimeTable{
         System.out.printf("\n%-5s %s\n", "No", "Movie Name");
 
         for (int i = 0; i < movies.size(); i++) {
-            //Date date = movies.get(i).getReleaseDate().getDate();
-            //Instant instant = date.toInstant();
-            //LocalDate localReleaseDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate localReleaseDate = movies.get(i).getReleaseDate().getDate();
 
             if (expectedDate != null && currentDate == null) {  // Future Movie(s)
                 if (localReleaseDate.equals(expectedDate) || localReleaseDate.isAfter(expectedDate)) {
-                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName());
+                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
                     foundMovieIDs.add(movies.get(i).getMovieID());
                 }
             } else if (expectedDate == null && currentDate == null) {  // All Movies
-                System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName());
+                System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
                 foundMovieIDs.add(movies.get(i).getMovieID());
             }
             else {
                 if (localReleaseDate.equals(expectedDate) || (localReleaseDate.isAfter(expectedDate) && localReleaseDate.isBefore(currentDate))) {
-                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName());
+                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
                     foundMovieIDs.add(movies.get(i).getMovieID());
                 }
             }

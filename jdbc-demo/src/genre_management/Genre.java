@@ -11,20 +11,37 @@ public class Genre {
     private int genreID;
     private Name genreName;
     private int post;
+    private int status;
 
     public Genre(){
         post = 0;
     }
 
     // Constructor for getting data from the database
-    public Genre(int genreID, Name genreName, int post){
+    public Genre(int genreID, Name genreName, int post, int status){
         this.genreID = genreID;
         this.genreName = genreName;
         this.post = post;
+        this.status = status;
     }
 
     // Method
-    public static void viewGenreDetails(ArrayList<Genre> genres) throws SQLException {
+    public static void viewGenreDetails(int status) throws SQLException {
+        ArrayList<Genre> genres = new ArrayList<>();
+        ResultSet result = null;
+
+        try {
+            Object[] params = {status};
+            result = DatabaseUtils.selectQueryById("*", "genre", "genre_status = ?", params);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        while (result.next()) {
+            Genre genre = new Genre(result.getInt("genre_id"), new Name(result.getString("genre_name")), result.getInt("post"), result.getInt("genre_status"));
+            genres.add(genre);
+        }
+
         System.out.printf("\n%-5s %-15s %s\n", "No", "Genre Name", "Post");
 
         for (Genre genre : genres) {
@@ -66,7 +83,6 @@ public class Genre {
 
         if (rowAffected > 0) {
             System.out.println("\nThe changes have been saved.");
-            setGenreName(genreName);
         } else {
             System.out.println("\nSomething went wrong...");
         }
@@ -112,5 +128,9 @@ public class Genre {
             post = result.getInt("post");
         }
         return post;
+    }
+
+    public int getStatus() {
+        return status;
     }
 }

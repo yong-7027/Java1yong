@@ -56,7 +56,7 @@ public class AdminMovie extends Movie {
                     break;
                 case 1:
                     do {
-                        int choice1 = Movie.viewMovieList(movies, sc);
+                        int choice1 = Movie.viewMovieList(1, sc);
                         if (choice1 != 0) {
                             Movie viewMovie = movies.get(choice1 - 1);
                             viewMovie.movieDetail();
@@ -90,7 +90,7 @@ public class AdminMovie extends Movie {
                 case 3:
                     do {
                         System.out.println("\nSelect the movie you want to modify: ");
-                        int choice2 = Movie.viewMovieList(movies, sc);
+                        int choice2 = Movie.viewMovieList(1, sc);
                         if (choice2 != 0) {
                             AdminMovie targetMovie = (AdminMovie) movies.get(choice2 - 1);
                             targetMovie.modifyMovie();
@@ -103,7 +103,7 @@ public class AdminMovie extends Movie {
                 case 4:
                     do {
                         System.out.println("\nSelect the movie you want to delete: ");
-                        int choice3 = Movie.viewMovieList(movies, sc);
+                        int choice3 = Movie.viewMovieList(1, sc);
                         if (choice3 != 0) {
                             AdminMovie deleteMovie = (AdminMovie) movies.get(choice3 - 1);
                             deleteMovie.deleteMovie();

@@ -21,7 +21,7 @@ public class AdminGenre extends Genre{
     }
 
     private AdminGenre(int genreID, Name genreName, int post) {
-        super(genreID, genreName, post); // Call the constructor of the parent class
+        //super(genreID, genreName, post); // Call the constructor of the parent class
     }
 
     // Method

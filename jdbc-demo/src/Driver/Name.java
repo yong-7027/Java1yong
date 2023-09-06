@@ -65,12 +65,12 @@ public class Name {
     }
 
     // For Edit Movie
-    public String checkEditName(String propertyName, ResultSet result, String searchThing, String orgMvName) throws Exception{
+    public String checkEditName(String propertyName, ResultSet result, String searchThing, String orgName) throws Exception{
         if (name.trim().isEmpty()) {
             return "Please enter the " + propertyName + " name.";
         }
         else {
-            boolean duplicateName = checkEditDuplicateName(result, searchThing, orgMvName);
+            boolean duplicateName = checkEditDuplicateName(result, searchThing, orgName);
             if(duplicateName == true) {
                 return "Same " + propertyName + " name detected.";
             }
@@ -80,13 +80,13 @@ public class Name {
         }
     }
 
-    public boolean checkEditDuplicateName(ResultSet result, String searchThing, String orgMvName) throws Exception{
+    public boolean checkEditDuplicateName(ResultSet result, String searchThing, String orgName) throws Exception{
         try {
             while (result.next()) {
                 String name = result.getString(searchThing);
 
                 if (this.name.equals(name)) {
-                    if (this.name.equals(orgMvName)) {
+                    if (this.name.equals(orgName)) {
                         result.close();
                         return false;
                     }

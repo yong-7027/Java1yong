@@ -9,6 +9,8 @@ import movie_management.ShowDate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,10 +20,18 @@ public class Cinema {
     private Name cinemaName;
     private Address cinemaAddress;
     private String cinemaPhone;
+    private int status;
     private static ArrayList<Cinema> cinemas = new ArrayList<>();
-    private static final String OFFICE_PHONE_REGEX = "^(01[0-9]-[0-9]{7}|011-[0-9]{8}|03-[0-9]{8}|08[0-9]-[0-9]{6}|0[0-9]-[0-9]{7})$";
+    private static final String OFFICE_PHONE_REGEX = "^(01[023456789]-[0-9]{7}|011-[0-9]{8}|03-[0-9]{8}|08[0-9]-[0-9]{6}|0[12456789]-[0-9]{7})$";
 
     public Cinema(){
+    }
+
+    public Cinema(int cinemaID, Name cinemaName, Address cinemaAddress, String cinemaPhone) {
+        this.cinemaID = cinemaID;
+        this.cinemaName = cinemaName;
+        this.cinemaAddress = cinemaAddress;
+        this.cinemaPhone = cinemaPhone;
     }
 
     public Cinema(Hall hall, int cinemaID, Name cinemaName, Address cinemaAddress, String cinemaPhone) {
@@ -69,6 +79,7 @@ public class Cinema {
                 cinema.setCinemaName(new Name(result.getString("cinema_name")));
                 cinema.setCinemaAddress(new Address(result.getString("cinema_address")));
                 cinema.setCinemaPhone(result.getString("cinema_phone"));
+                cinema.setStatus(result.getInt("cinema_status"));
 
                 cinemas.add(cinema);
             }
@@ -121,6 +132,71 @@ public class Cinema {
         }
     }
 
+    public int modifyCinemaDetails(Scanner sc) {
+        boolean error = true;
+
+        do {
+            try {
+                int count = 1;
+                System.out.printf("\nCinema Detail:\n");
+                System.out.println(count + ". Cinema Name: " + getCinemaName().getName());
+                count++;
+                System.out.println(count + ". Cinema Address: " + getCinemaAddress().getAddress());
+                count++;
+                System.out.println(count + ". Cinema Phone: " + getCinemaPhone());
+
+                System.out.print("\nEnter the serial number of the cinema information you want to change (0 - Stop): ");
+                int serialNum = sc.nextInt();
+                sc.nextLine();
+
+                if (serialNum < 0 || serialNum > count) {
+                    System.out.println("Your choice is not among the available options! PLease try again.");
+                } else {
+                    return serialNum;
+                }
+            }
+            catch (InputMismatchException e) {
+                System.out.println("Please enter a valid choice!");
+                sc.nextLine();
+                error = true;
+            }
+        } while (error);
+
+        return 0;
+    }
+
+    public void modifyCinema() throws SQLException {
+        try {
+            String updateSql = "UPDATE `cinema` SET `cinema_name`= ?, `cinema_address`= ?, `cinema_phone`= ? WHERE cinema_id = ?";
+            Object[] params = {getCinemaName().getName(), getCinemaAddress().getAddress(), getCinemaPhone(), getCinemaID()};
+            int rowAffected = DatabaseUtils.updateQuery(updateSql, params);
+            if (rowAffected > 0) {
+                System.out.println("\nThe changes have been saved.");
+            } else {
+                System.out.println("\nSomething went wrong...");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteCinema() throws SQLException {
+        try {
+            Object[] params = {getCinemaID()};
+            int rowAffected = DatabaseUtils.deleteQueryById("cinema", "cinema_status", "cinema_id", params);
+
+            if (rowAffected > 0) {
+                System.out.println("\nThe cinema has been deleted.");
+            } else {
+                System.out.println("\nSomething went wrong...");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public ArrayList<Hall> viewHallList(int status) throws SQLException {
         ArrayList<Hall> halls = new ArrayList<>();
 
@@ -135,6 +211,7 @@ public class Cinema {
                 hall.setHallName(new Name(result.getString("hall_name")));
                 hall.setHallType(result.getString("hall_type"));
                 hall.calHallCapacity();
+                hall.setStatus(result.getInt("hall_status"));
 
                 halls.add(hall);
             }
@@ -196,6 +273,10 @@ public class Cinema {
         this.cinemaPhone = cinemaPhone;
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public Hall getHall() {
         return hall;
     }
@@ -214,6 +295,10 @@ public class Cinema {
 
     public String getCinemaPhone() {
         return cinemaPhone;
+    }
+
+    public int getStatus() {
+        return status;
     }
 
     public static ArrayList<Cinema> getCinemas() {

@@ -25,12 +25,14 @@ public class Movie {
     private String metaDescription;
     private double childTicketPrice;
     private double adultTicketPrice;
+    private int stutus;
     private static ArrayList<Movie> movies = new ArrayList<>();
 
     public Movie(){
     }
 
-    public Movie(Name mvName, ShowDate releaseDate, int duration, String lang, String director, String writter, String starring, String musicProvider, String country, String metaDescription, double childTicketPrice, double adultTicketPrice) {
+    public Movie(int genreID, Name mvName, ShowDate releaseDate, int duration, String lang, String director, String writter, String starring, String musicProvider, String country, String metaDescription, double childTicketPrice, double adultTicketPrice) {
+        this.genreID = genreID;
         this.mvName = mvName;
         this.releaseDate = releaseDate;
         this.duration = duration;
@@ -47,8 +49,7 @@ public class Movie {
 
     static {
         try {
-            Object[] params = {1};
-            ResultSet result = DatabaseUtils.selectQueryById("*", "movie", "movie_status = ?", params);
+            ResultSet result = DatabaseUtils.selectQueryById("*", "movie", null, null);
 
             while (result.next()) {
                 //Movie movie = new Movie(id, mvName, releaseDate, duration, lang, director, writter, starring, musicProvider, country, metaDescription, childTicketPrice, adultTicketPrice);
@@ -79,8 +80,42 @@ public class Movie {
         }
     }
 
-    public static int viewMovieList(ArrayList<Movie> movies, Scanner sc) {
+    public static int viewMovieList(int status, Scanner sc) {
         boolean error = false;
+        ArrayList<Movie> movies = new ArrayList<>();
+
+        try {
+            Object[] params = {status};
+            ResultSet result = DatabaseUtils.selectQueryById("*", "movie", "movie_status = ?", params);
+
+            while (result.next()) {
+                //Movie movie = new Movie(id, mvName, releaseDate, duration, lang, director, writter, starring, musicProvider, country, metaDescription, childTicketPrice, adultTicketPrice);
+                Movie movie = new Movie();
+
+                movie.setMovieID(result.getInt("movie_id"));
+                movie.setGenreID(result.getInt("genre_id"));
+                movie.setMvName(new Name(result.getString("mv_name")));
+                movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
+                movie.setDuration(result.getInt("duration"));
+                movie.setLang(result.getString("lang"));
+                movie.setDirector(result.getString("director"));
+                movie.setWritter(result.getString("writter"));
+                movie.setStarring(result.getString("starring"));
+                movie.setMusicProvider(result.getString("music"));
+                movie.setCountry(result.getString("country"));
+                movie.setMetaDescription(result.getString("meta_description"));
+                movie.setChildTicketPrice(result.getDouble("childTicket_Price"));
+                movie.setAdultTicketPrice(result.getDouble("adultTicket_Price"));
+                movie.setStutus(result.getInt("movie_status"));
+
+                movies.add(movie);
+            }
+
+            result.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         do {
             try {
@@ -93,12 +128,12 @@ public class Movie {
                 int choice = sc.nextInt();
                 sc.nextLine();
 
-                if (choice < 0 || choice > movies.size()) {
-                    System.out.println("Your choice is not among the available options! PLease try again.");
-                    error = true;
+                if (choice == 0 || (choice > 0 && choice <= movies.size() && movies.get(choice - 1).getStutus() == 1)) {
+                    return choice;
                 }
                 else {
-                    return choice;
+                    System.out.println("Your choice is not among the available options! PLease try again.");
+                    error = true;
                 }
             }
             catch (InputMismatchException e) {
@@ -411,6 +446,10 @@ public class Movie {
         this.adultTicketPrice = adultTicketPrice;
     }
 
+    public void setStutus(int stutus) {
+        this.stutus = stutus;
+    }
+
     public int getMovieID() {
         return movieID;
     }
@@ -465,6 +504,10 @@ public class Movie {
 
     public double getAdultTicketPrice() {
         return adultTicketPrice;
+    }
+
+    public int getStutus() {
+        return stutus;
     }
 
     public static ArrayList<Movie> getAllMovies() {

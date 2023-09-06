@@ -15,7 +15,7 @@ public class Driver {
         //CustomerMovie.customer(sc);
         //AdminMovie.adminMovie(sc);
         //AdminGenre.adminGenre(sc);
-        AdminTimeTable.adminTimeTable(sc);
+        //AdminTimeTable.adminTimeTable(sc);
 
         System.out.println("Select the operation:");
         System.out.println("1. Manage Cinema");
@@ -42,7 +42,7 @@ public class Driver {
                     try {
                         System.out.println("\nSelect the cinema you want to manage it's hall: ");
                         for (int i = 0; i < cinemas.size(); i++) {
-                            System.out.println((i + 1) + ". " + cinemas.get(i).getCinemaName());
+                            System.out.println((i + 1) + ". " + cinemas.get(i).getCinemaName().getName());
                         }
                         System.out.print("\nEnter your selection: ");
                         cinemaSelected = sc.nextInt();
@@ -58,11 +58,11 @@ public class Driver {
                         System.out.println("Please enter a valid cinema no!");
                         sc.nextLine();
                     }
-
-                    Cinema cinema = cinemas.get(cinemaSelected - 1);
-                    system = new SystemClass(cinema);
-                    system.manageHall(sc);
                 } while (error);
+
+                Cinema cinema = cinemas.get(cinemaSelected - 1);
+                system = new SystemClass(cinema);
+                system.manageHall(sc);
                 break;
             case 3:
                 system = new SystemClass();

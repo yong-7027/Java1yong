@@ -211,6 +211,31 @@ public class Address {
         }
     }
 
+    public boolean checkEditAddressDuplicate(ResultSet result, String searchThing, String orgAddress) {
+        try {
+            while (result.next()) {
+                String address = result.getString(searchThing);
+
+                if (getAddress().equals(address)) {
+                    if (getAddress().equals(orgAddress)) {
+                        result.close();
+                        return false;
+                    }
+                    else {
+                        result.close();
+                        return true;
+                    }
+                }
+            }
+            result.close();
+
+            return false;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // Setter
     public void setStreet(String street) {
         this.street = street;

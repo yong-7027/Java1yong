@@ -12,6 +12,7 @@ public class Hall {
     private Name hallName;
     private String hallType;
     private int hallCapacity;
+    private int status;
 
     // Constructor
     public Hall(){
@@ -47,7 +48,7 @@ public class Hall {
         System.out.println("Hall Capacity: " + getHallCapacity());
     }
 
-    public int modifyHallDetails(Scanner sc){
+    public int modifyHallDetails(Scanner sc) {
         boolean error = true;
 
         do {
@@ -127,6 +128,10 @@ public class Hall {
         calHallCapacity();
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     // Getter
     public int getHallID(){
         return hallID;
@@ -142,5 +147,9 @@ public class Hall {
 
     public int getHallCapacity() {
         return hallCapacity;
+    }
+
+    public int getStatus() {
+        return status;
     }
 }

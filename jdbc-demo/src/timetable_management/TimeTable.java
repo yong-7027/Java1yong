@@ -56,7 +56,7 @@ public class TimeTable {
                 cinemaNo = sc.nextInt();
                 sc.nextLine();
 
-                if (cinemaNo > 0 && cinemaNo <= cinemas.size()) {
+                if (cinemaNo > 0 && cinemaNo <= cinemas.size() && cinemas.get(cinemaNo - 1).getStatus() == 1) {
                     error = false;
                 }
                 else {
@@ -81,7 +81,7 @@ public class TimeTable {
                 hallNo = sc.nextInt();
                 sc.nextLine();
 
-                if (hallNo > 0 && hallNo <= halls.size()) {
+                if (hallNo > 0 && hallNo <= halls.size() && halls.get(hallNo - 1).getStatus() == 1) {
                     error = false;
                 }
                 else {

@@ -1,6 +1,7 @@
 package Driver;
 
 import cinema_management.Cinema;
+import seat_management.Seat;
 import hall_management.Hall;
 import timetable_management.AdminTimeTable;
 
@@ -10,8 +11,9 @@ import java.util.Scanner;
 
 public class Driver {
     public static void main(String[] args) throws Exception {
-        Scanner sc = new Scanner(System.in);
 
+        Scanner sc = new Scanner(System.in);
+        AdminTimeTable.adminTimeTable(sc);
         //CustomerMovie.customer(sc);
         //AdminMovie.adminMovie(sc);
         //AdminGenre.adminGenre(sc);

@@ -97,6 +97,7 @@ public class Movie {
                 movie.setMvName(new Name(result.getString("mv_name")));
                 movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
                 movie.setDuration(result.getInt("duration"));
+                movie.setDuration(result.getInt("duration"));
                 movie.setLang(result.getString("lang"));
                 movie.setDirector(result.getString("director"));
                 movie.setWritter(result.getString("writter"));

@@ -1,18 +1,20 @@
 package movie_management;
 
 import Connect.DatabaseUtils;
+import Driver.CrudOperations;
 import Driver.Name;
+import genre_management.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Movie {
+public class Movie implements CrudOperations {
     private int movieID;
-    private int genreID;
+    private Genre genre;
     private Name mvName;
     private ShowDate releaseDate;
     private int duration;
@@ -31,8 +33,8 @@ public class Movie {
     public Movie(){
     }
 
-    public Movie(int genreID, Name mvName, ShowDate releaseDate, int duration, String lang, String director, String writter, String starring, String musicProvider, String country, String metaDescription, double childTicketPrice, double adultTicketPrice) {
-        this.genreID = genreID;
+    public Movie(Genre genre, Name mvName, ShowDate releaseDate, int duration, String lang, String director, String writter, String starring, String musicProvider, String country, String metaDescription, double childTicketPrice, double adultTicketPrice) {
+        this.genre = genre;
         this.mvName = mvName;
         this.releaseDate = releaseDate;
         this.duration = duration;
@@ -56,7 +58,7 @@ public class Movie {
                 Movie movie = new Movie();
 
                 movie.setMovieID(result.getInt("movie_id"));
-                movie.setGenreID(result.getInt("genre_id"));
+                movie.setGenre(new Genre(result.getInt("genre_id")));
                 movie.setMvName(new Name(result.getString("mv_name")));
                 movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
                 movie.setDuration(result.getInt("duration"));
@@ -80,8 +82,156 @@ public class Movie {
         }
     }
 
-    public static int viewMovieList(int status, Scanner sc) {
-        boolean error = false;
+    // Show movie details
+    public void viewMovieDetails() {
+        System.out.printf("\nMovie Detail:\n");
+        System.out.println("Movie Name: " + getMvName().getName());
+        System.out.println("Release Date: " + getReleaseDate().getDate());
+        System.out.println("Duration: " + getDuration() + " minutes");
+        System.out.println("Language: " + getLang());
+        System.out.println("Director: " + getDirector());
+        System.out.println("Writter: " + getWritter());
+        System.out.println("Starring: " + getStarring());
+        System.out.println("Music Producer: " + getMusicProvider());
+        System.out.println("Country: " + getCountry());
+        System.out.printf("%s %.2f\n", "Child Ticket Price:", getChildTicketPrice());
+        System.out.printf("%s %.2f\n", "Adult Ticket Price:", getAdultTicketPrice());
+        System.out.println("\nSynopsis:\n" + getMetaDescription());
+    }
+
+    public void add() throws Exception {
+        int rowAffected = 0;
+
+        try {
+            String insertSql = "INSERT INTO `movie`(`genre_id`, `mv_name`, `release_date`, `duration`, `lang`, `director`, `writter`, `starring`, `music`, `country`,`meta_description`, `childTicket_Price`, `adultTicket_Price`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            Object[] params = {getGenre().getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getChildTicketPrice(), getAdultTicketPrice()};
+            rowAffected = DatabaseUtils.insertQuery(insertSql, params);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (rowAffected > 0) {
+            System.out.println("\nMovie successfully added...");
+        }
+        else {
+            System.out.println("\nSomething went wrong!");
+        }
+    }
+
+    public void modify() throws Exception {
+        int rowAffected = 0;
+
+        try {
+            String updateSql = "UPDATE `movie` SET `genre_id`= ?, `mv_name`= ?," +
+                    "`release_date`= ?,`duration`= ?,`lang`= ?," +
+                    "`director`= ?,`writter`= ?,`starring`= ?,`music`= ?," +
+                    "`country`= ?,`meta_description`= ?, `childTicket_Price`= ?," +
+                    "`adultTicket_Price`= ? WHERE movie_id = ?";
+            Object[] params = {getGenre().getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getChildTicketPrice(), getAdultTicketPrice(), getMovieID()};
+            rowAffected = DatabaseUtils.updateQuery(updateSql, params);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (rowAffected > 0) {
+            System.out.println("\nThe changes have been saved.");
+        }
+        else {
+            System.out.println("\nSomething went wrong...");
+        }
+    }
+
+    // Delete Movie
+    public void delete() throws SQLException {
+        int rowAffected = 0;
+
+        try {
+            Object[] params = {getMovieID()};
+            rowAffected = DatabaseUtils.deleteQueryById("movie", "movie_status", "movie_id", params);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (rowAffected > 0) {
+            System.out.println("\nThe movie has been deleted.");
+        } else {
+            System.out.println("\nSomething went wrong...");
+        }
+    }
+
+    public static ArrayList<Movie> viewMovieListByFilter(Scanner sc) throws Exception {
+        LocalDate currentDate = LocalDate.now();
+        ArrayList<Movie> moviesAfterFiltered = new ArrayList<>();
+        boolean error = true;
+        int choice = 0;
+
+        do {
+            do {
+                try {
+                    System.out.println("\nPlease select a movie filtering from the list below: ");
+                    System.out.println("1. Future Movie");
+                    System.out.println("2. Movie within 1 week");
+                    System.out.println("3. Movie within 1 month");
+                    System.out.println("4. Movie within 3 months");
+                    System.out.println("5. Movie within 1 year");
+                    System.out.println("6. All movies");
+                    System.out.print("\nEnter your selection (0 - Back): ");
+                    choice = sc.nextInt();
+                    sc.nextLine();
+
+                    if (choice < 0 || choice > 6) {
+                        System.out.println("Your choice is not among the available options! PLease try again.");
+                    } else {
+                        error = false;
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Please enter a valid choice!");
+                    sc.nextLine();
+                }
+            } while (error);
+
+            switch (choice) {
+                case 0:
+                    return null;
+                case 1:
+                    // 1. future movie
+                    LocalDate futureMovie = currentDate.plusDays(1);
+                    moviesAfterFiltered = showMovieListAfterFiltered(futureMovie, null, 1);
+                    break;
+                case 2:
+                    // 2. within 1 week
+                    LocalDate oneWeekAgo = currentDate.minusWeeks(1);
+                    moviesAfterFiltered = showMovieListAfterFiltered(oneWeekAgo, currentDate, 1);
+                    break;
+                case 3:
+                    // 3. within 1 month
+                    LocalDate oneMonthAgo = currentDate.minusMonths(1);
+                    moviesAfterFiltered = showMovieListAfterFiltered(oneMonthAgo, currentDate, 1);
+                    break;
+                case 4:
+                    // 4. within 3 month
+                    LocalDate threeMonthAgo = currentDate.minusMonths(3);
+                    moviesAfterFiltered = showMovieListAfterFiltered(threeMonthAgo, currentDate, 1);
+                    break;
+                case 5:
+                    // 5. within 1 year
+                    LocalDate oneYearAgo = currentDate.minusYears(1);
+                    moviesAfterFiltered = showMovieListAfterFiltered(oneYearAgo, currentDate, 1);
+                    break;
+                case 6:
+                    // 6. all movie
+                    moviesAfterFiltered = showMovieListAfterFiltered(null, null, 1);
+                    break;
+            }
+        } while (moviesAfterFiltered.isEmpty() && choice != 0);
+
+        return moviesAfterFiltered;
+    }
+
+    public static ArrayList<Movie> showMovieListAfterFiltered(LocalDate expectedDate, LocalDate currentDate, int status){
         ArrayList<Movie> movies = new ArrayList<>();
 
         try {
@@ -93,7 +243,7 @@ public class Movie {
                 Movie movie = new Movie();
 
                 movie.setMovieID(result.getInt("movie_id"));
-                movie.setGenreID(result.getInt("genre_id"));
+                movie.setGenre(new Genre(result.getInt("genre_id")));
                 movie.setMvName(new Name(result.getString("mv_name")));
                 movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
                 movie.setDuration(result.getInt("duration"));
@@ -117,112 +267,35 @@ public class Movie {
             e.printStackTrace();
         }
 
-        do {
-            try {
-                System.out.printf("\n%-5s %s\n", "No", "Movie Name");
-                for (Movie movie : movies) {
-                    System.out.printf("%-5d %s\n", movie.getMovieID(), movie.getMvName().getName());
-                }
+        ArrayList<Movie> moviesAfterFiltered = new ArrayList<>();
 
-                System.out.print("\nEnter the movie no (0 - Back): ");
-                int choice = sc.nextInt();
-                sc.nextLine();
+        System.out.printf("\n%-5s %s\n", "No", "Movie Name");
 
-                if (choice == 0 || (choice > 0 && choice <= movies.size() && movies.get(choice - 1).getStutus() == 1)) {
-                    return choice;
+        for (int i = 0; i < movies.size(); i++) {
+            LocalDate localReleaseDate = movies.get(i).getReleaseDate().getDate();
+
+            if (expectedDate != null && currentDate == null) {  // Future Movie(s)
+                if (localReleaseDate.equals(expectedDate) || localReleaseDate.isAfter(expectedDate)) {
+                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
+                    moviesAfterFiltered.add(movies.get(i));
                 }
-                else {
-                    System.out.println("Your choice is not among the available options! PLease try again.");
-                    error = true;
+            } else if (expectedDate == null && currentDate == null) {  // All Movies
+                System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
+                moviesAfterFiltered.add(movies.get(i));
+            }
+            else {
+                if (localReleaseDate.equals(expectedDate) || (localReleaseDate.isAfter(expectedDate) && localReleaseDate.isBefore(currentDate))) {
+                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
+                    moviesAfterFiltered.add(movies.get(i));
                 }
             }
-            catch (InputMismatchException e) {
-                System.out.println("Please enter a valid choice!");
-                sc.nextLine();
-                error = true;
-            }
-        } while (error);
-        return 0;
-    }
-
-    // Show movie details
-    public void movieDetail() {
-        System.out.printf("\nMovie Detail:\n");
-        System.out.println("Movie Name: " + getMvName().getName());
-        System.out.println("Release Date: " + getReleaseDate().getDate());
-        System.out.println("Duration: " + getDuration() + " minutes");
-        System.out.println("Language: " + getLang());
-        System.out.println("Director: " + getDirector());
-        System.out.println("Writter: " + getWritter());
-        System.out.println("Starring: " + getStarring());
-        System.out.println("Music Producer: " + getMusicProvider());
-        System.out.println("Country: " + getCountry());
-        System.out.printf("%s %.2f\n", "Child Ticket Price:", getChildTicketPrice());
-        System.out.printf("%s %.2f\n", "Adult Ticket Price:", getAdultTicketPrice());
-        System.out.println("\nSynopsis:\n" + getMetaDescription());
-    }
-
-    public void addMovie() throws Exception {
-        int rowAffected = 0;
-
-        try {
-            String insertSql = "INSERT INTO `movie`(`genre_id`, `mv_name`, `release_date`, `duration`, `lang`, `director`, `writter`, `starring`, `music`, `country`,`meta_description`, `childTicket_Price`, `adultTicket_Price`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            Object[] params = {getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getChildTicketPrice(), getAdultTicketPrice()};
-            rowAffected = DatabaseUtils.insertQuery(insertSql, params);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
         }
 
-        if (rowAffected > 0) {
-            System.out.println("\nMovie successfully added...");
-        }
-        else {
-            System.out.println("\nSomething went wrong!");
-        }
-    }
-
-    public void modifyMovie() throws Exception {
-        int rowAffected = 0;
-
-        try {
-            String updateSql = "UPDATE `movie` SET `genre_id`= ?, `mv_name`= ?," +
-                    "`release_date`= ?,`duration`= ?,`lang`= ?," +
-                    "`director`= ?,`writter`= ?,`starring`= ?,`music`= ?," +
-                    "`country`= ?,`meta_description`= ?, `childTicket_Price`= ?," +
-                    "`adultTicket_Price`= ? WHERE movie_id = ?";
-            Object[] params = {getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getChildTicketPrice(), getAdultTicketPrice(), getMovieID()};
-            rowAffected = DatabaseUtils.updateQuery(updateSql, params);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
+        if (moviesAfterFiltered.isEmpty()) {
+            System.out.println("Sorry, no movie found!");
         }
 
-        if (rowAffected > 0) {
-            System.out.println("\nThe changes have been saved.");
-        }
-        else {
-            System.out.println("\nSomething went wrong...");
-        }
-    }
-
-    // Delete Movie
-    public void deleteMovie() throws SQLException {
-        int rowAffected = 0;
-
-        try {
-            Object[] params = {getMovieID()};
-            rowAffected = DatabaseUtils.deleteQueryById("movie", "movie_status", "movie_id", params);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (rowAffected > 0) {
-            System.out.println("\nThe movie has been deleted.");
-        } else {
-            System.out.println("\nSomething went wrong...");
-        }
+        return moviesAfterFiltered;
     }
 
     // Method for add movie
@@ -235,10 +308,12 @@ public class Movie {
             System.out.print("\nEnter the movie " + propertyName + ": ");
             String value = sc.nextLine();
 
+            Name name = new Name(value);
+
             String errorMessage = MovieValidator.checkValue(value, propertyName);
 
             if (errorMessage == null) {
-                value = MovieUtils.capitalizeWords(value);
+                name.capitalizeWords();
                 error = false;
 
                 do {
@@ -252,9 +327,9 @@ public class Movie {
                 } while (continues.equals("Invalid"));
 
                 if (continues.equals("Y")) {
-                    result.append(value).append(", ");
+                    result.append(name.getName()).append(", ");
                 } else {
-                    result.append(value);
+                    result.append(name.getName());
                 }
             } else {
                 System.out.println(errorMessage);
@@ -333,7 +408,7 @@ public class Movie {
 
         do {
             try {
-                Object[] params = {getGenreID()};
+                Object[] params = {getGenre().getGenreID()};
                 ResultSet result = DatabaseUtils.selectQueryById("genre_name", "genre", "genre_id = ?", params);
 
                 try {
@@ -394,8 +469,8 @@ public class Movie {
         this.movieID = movieID;
     }
 
-    public void setGenreID(int genreID){
-        this.genreID = genreID;
+    public void setGenre(Genre genre){
+        this.genre = genre;
     }
 
     public void setMvName(Name mvName) {
@@ -454,8 +529,8 @@ public class Movie {
         return movieID;
     }
 
-    public int getGenreID(){
-        return genreID;
+    public Genre getGenre(){
+        return genre;
     }
 
     public Name getMvName() {

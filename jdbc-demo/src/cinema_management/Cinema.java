@@ -1,10 +1,9 @@
 package cinema_management;
 
 import Connect.DatabaseUtils;
+import Driver.CrudOperations;
 import Driver.Name;
 import hall_management.Hall;
-import movie_management.Movie;
-import movie_management.ShowDate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +13,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Cinema {
+public class Cinema implements CrudOperations {
     private Hall hall;
     private int cinemaID;
     private Name cinemaName;
@@ -112,7 +111,7 @@ public class Cinema {
         return matcher.matches();
     }
 
-    public void addCinema() throws SQLException {
+    public void add() throws SQLException {
         int rowAffected = 0;
 
         try {
@@ -165,7 +164,7 @@ public class Cinema {
         return 0;
     }
 
-    public void modifyCinema() throws SQLException {
+    public void modify() throws SQLException {
         try {
             String updateSql = "UPDATE `cinema` SET `cinema_name`= ?, `cinema_address`= ?, `cinema_phone`= ? WHERE cinema_id = ?";
             Object[] params = {getCinemaName().getName(), getCinemaAddress().getAddress(), getCinemaPhone(), getCinemaID()};
@@ -181,7 +180,7 @@ public class Cinema {
         }
     }
 
-    public void deleteCinema() throws SQLException {
+    public void delete() throws SQLException {
         try {
             Object[] params = {getCinemaID()};
             int rowAffected = DatabaseUtils.deleteQueryById("cinema", "cinema_status", "cinema_id", params);

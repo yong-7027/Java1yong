@@ -2,8 +2,6 @@ package genre_management;
 
 import Connect.DatabaseUtils;
 import Driver.Name;
-import movie_management.AdminMovie;
-import movie_management.Movie;
 import movie_management.MovieUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -78,7 +76,7 @@ public class AdminGenre extends Genre{
                     case 2:
                         do {
                             AdminGenre newGenre = new AdminGenre();
-                            newGenre.addGenre();
+                            newGenre.add();
                             String addGenre;
                             do {
                                 System.out.println("\nDo you want add another new genre? (Y / N)");

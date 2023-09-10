@@ -1,8 +1,6 @@
 package movie_management;
 
 import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
 public class MovieUtils {
     private MovieUtils(){
@@ -18,21 +16,6 @@ public class MovieUtils {
             }
         }
         return null;
-    }
-
-    public static String capitalizeWords(String input){
-        StringBuilder result = new StringBuilder();
-        String[] words = input.split(" ");
-
-        for (String word : words) {
-            if (!word.isEmpty()) {
-                char firstChar = Character.toUpperCase(word.charAt(0));  // Capitalize the first character of the word
-                String restOfWord = word.substring(1).toLowerCase();  // substring(1) returns a substring from index 1 (the second character) to the end of the string
-                result.append(firstChar).append(restOfWord).append(" ");  // Combine them and put them into result
-            }
-        }
-
-        return result.toString().trim();  // Replace it with a normal string and remove the leading and trailing spaces
     }
 
     public static String askForContinue(String answer){

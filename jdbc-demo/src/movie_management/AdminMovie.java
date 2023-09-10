@@ -1,4 +1,4 @@
-package movie_management;
+/*package movie_management;
 
 import Connect.DatabaseUtils;
 import Driver.Name;
@@ -59,7 +59,7 @@ public class AdminMovie extends Movie {
                         int choice1 = Movie.viewMovieList(1, sc);
                         if (choice1 != 0) {
                             Movie viewMovie = movies.get(choice1 - 1);
-                            viewMovie.movieDetail();
+                            viewMovie.viewMovieDetails();
                             continues = true;
                         } else {
                             continues = false;
@@ -69,7 +69,7 @@ public class AdminMovie extends Movie {
                 case 2:
                     do {
                         AdminMovie newMovie = new AdminMovie();
-                        newMovie.addMovie();
+                        newMovie.add();
                         String addMovie;
                         do {
                             System.out.println("\nDo you want add another new movie? (Y / N)");
@@ -93,7 +93,7 @@ public class AdminMovie extends Movie {
                         int choice2 = Movie.viewMovieList(1, sc);
                         if (choice2 != 0) {
                             AdminMovie targetMovie = (AdminMovie) movies.get(choice2 - 1);
-                            targetMovie.modifyMovie();
+                            targetMovie.modify();
                             continues = true;
                         } else {
                             continues = false;
@@ -106,7 +106,7 @@ public class AdminMovie extends Movie {
                         int choice3 = Movie.viewMovieList(1, sc);
                         if (choice3 != 0) {
                             AdminMovie deleteMovie = (AdminMovie) movies.get(choice3 - 1);
-                            deleteMovie.deleteMovie();
+                            deleteMovie.delete();
                             continues = true;
                         } else {
                             continues = false;
@@ -133,7 +133,7 @@ public class AdminMovie extends Movie {
             String errorMessage = MovieValidator.checkValue(value, propertyName);
 
             if (errorMessage == null) {
-                value = MovieUtils.capitalizeWords(value);
+                // value = MovieUtils.capitalizeWords(value);
                 error = false;
 
                 do {
@@ -221,4 +221,4 @@ public class AdminMovie extends Movie {
 
         return 0;
     }
-}
+}*/

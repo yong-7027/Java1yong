@@ -80,7 +80,8 @@ public class CustomerMovie extends Movie{
                                 break;
                             }
                             else{
-                                Movie movie = MovieUtils.queryMovie(movies, mvName);
+                                // Movie movie = MovieUtils.queryMovie(movies, mvName);
+                                Movie movie = new Movie();
 
                                 if (movie != null) {
                                     movie.viewMovieDetails();
@@ -92,7 +93,7 @@ public class CustomerMovie extends Movie{
                                         String answer1 = sc.next();
                                         sc.nextLine(); // 消耗剩余的回车符
 
-                                        continues = MovieUtils.askForContinue(answer1);
+                                        // continues = MovieUtils.askForContinue(answer1);
                                     } while (continues.equals("Invalid"));
 
                                     if (continues.equals("Y")) {

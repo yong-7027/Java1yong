@@ -61,7 +61,7 @@ public class AdminGenre extends Genre{
                             String answer = sc.next();
                             sc.nextLine();
 
-                            exit = MovieUtils.askForContinue(answer);
+                            // exit = MovieUtils.askForContinue(answer);
                         } while (exit.equals("Invalid"));
 
                         if (exit.equals("Y")) {
@@ -77,14 +77,14 @@ public class AdminGenre extends Genre{
                         do {
                             AdminGenre newGenre = new AdminGenre();
                             newGenre.add();
-                            String addGenre;
+                            String addGenre = null;
                             do {
                                 System.out.println("\nDo you want add another new genre? (Y / N)");
                                 System.out.print("Answer: ");
                                 String answer = sc.next();
                                 sc.nextLine();
 
-                                addGenre = MovieUtils.askForContinue(answer);
+                                // addGenre = MovieUtils.askForContinue(answer);
                             } while (addGenre.equals("Invalid"));
 
                             if (addGenre.equals("Y")) {

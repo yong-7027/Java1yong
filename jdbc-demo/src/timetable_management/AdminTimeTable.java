@@ -54,7 +54,7 @@ public class AdminTimeTable extends TimeTable{
                         String answer = sc.next();
                         sc.nextLine();
 
-                        exit = MovieUtils.askForContinue(answer);
+                        // exit = MovieUtils.askForContinue(answer);
                     } while (exit.equals("Invalid"));
 
                     if (exit.equals("Y")) {

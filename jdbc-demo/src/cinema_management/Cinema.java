@@ -196,7 +196,7 @@ public class Cinema implements CrudOperations {
         }
     }
 
-    public ArrayList<Hall> viewHallList(int status) throws SQLException {
+    public ArrayList<Hall> getHallList(int status) throws SQLException {
         ArrayList<Hall> halls = new ArrayList<>();
 
         try {
@@ -219,10 +219,6 @@ public class Cinema implements CrudOperations {
         }
         catch (SQLException e) {
             e.printStackTrace();
-        }
-
-        for (int i = 0; i < halls.size(); i++) {
-            System.out.println((i + 1) + ". " + halls.get(i).getHallName().getName());
         }
 
         return halls;

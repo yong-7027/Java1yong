@@ -31,9 +31,10 @@ public class Genre implements CrudOperations {
     }
 
     // Method
-    public static void viewGenreDetails(int status) throws SQLException {
+    public static ArrayList<Genre> viewGenreDetails(int status) throws SQLException {
         ArrayList<Genre> genres = new ArrayList<>();
         ResultSet result = null;
+        int count = 1;
 
         try {
             Object[] params = {status};
@@ -50,8 +51,11 @@ public class Genre implements CrudOperations {
         System.out.printf("\n%-5s %-15s %s\n", "No", "Genre Name", "Post");
 
         for (Genre genre : genres) {
-            System.out.printf("%-5d %-15s %s\n", genre.getGenreID(), genre.getGenreName().getName(), genre.getPost());
+            System.out.printf("%-5d %-15s %s\n", count, genre.getGenreName().getName(), genre.getPost());
+            count++;
         }
+
+        return genres;
     }
 
     public void add() throws SQLException {

@@ -1,13 +1,14 @@
 package genre_management;
 
 import Connect.DatabaseUtils;
+import Driver.CrudOperations;
 import Driver.Name;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class Genre {
+public class Genre implements CrudOperations {
     private int genreID;
     private Name genreName;
     private int post;
@@ -18,6 +19,10 @@ public class Genre {
     }
 
     // Constructor for getting data from the database
+    public Genre(int genreID){
+        this.genreID = genreID;
+    }
+
     public Genre(int genreID, Name genreName, int post, int status){
         this.genreID = genreID;
         this.genreName = genreName;
@@ -49,7 +54,7 @@ public class Genre {
         }
     }
 
-    public void addGenre() throws SQLException {
+    public void add() throws SQLException {
         int rowAffected = 0;
 
         try {
@@ -69,7 +74,7 @@ public class Genre {
         }
     }
 
-    public void modifyGenre() throws SQLException {
+    public void modify() throws SQLException {
         int rowAffected = 0;
 
         try {
@@ -88,7 +93,7 @@ public class Genre {
         }
     }
 
-    public void deleteGenre() throws SQLException {
+    public void delete() throws SQLException {
         int rowAffected = 0;
 
         try {

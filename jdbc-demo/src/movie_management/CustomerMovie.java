@@ -2,6 +2,7 @@ package movie_management;
 
 import Connect.DatabaseUtils;
 import Driver.Name;
+import genre_management.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +25,7 @@ public class CustomerMovie extends Movie{
                 CustomerMovie movie = new CustomerMovie();
 
                 movie.setMovieID(result.getInt("movie_id"));
-                movie.setGenreID(result.getInt("genre_id"));
+                movie.setGenre(new Genre(result.getInt("genre_id")));
                 movie.setMvName(new Name(result.getString("mv_name")));
                 movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
                 movie.setDuration(result.getInt("duration"));
@@ -82,7 +83,7 @@ public class CustomerMovie extends Movie{
                                 Movie movie = MovieUtils.queryMovie(movies, mvName);
 
                                 if (movie != null) {
-                                    movie.movieDetail();
+                                    movie.viewMovieDetails();
                                     String continues = "N";
 
                                     do {

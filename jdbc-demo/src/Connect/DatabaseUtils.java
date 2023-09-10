@@ -11,7 +11,7 @@ public class DatabaseUtils {
     private DatabaseUtils() {
     }
 
-    public static Connection getConnection() throws SQLException {
+    private static Connection getConnection() throws SQLException {
         // 获取连接
         return DriverManager.getConnection(DB_URL, DB_UNAME, DB_PSD);
     }

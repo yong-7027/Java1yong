@@ -24,6 +24,7 @@ public class Driver {
         System.out.println("2. Manage Hall");
         System.out.println("3. Manage Movie");
         System.out.println("4. Manage Genre");
+        System.out.println("5. Manage Schedule");
         System.out.print("\nEnter your selection: ");
 
         int choice = sc.nextInt();
@@ -74,6 +75,9 @@ public class Driver {
                 system = new SystemClass();
                 system.manageGenre(sc);
                 break;
+            case 5:
+                system = new SystemClass();
+                system.manageSchedule(sc);
         }
     }
 }

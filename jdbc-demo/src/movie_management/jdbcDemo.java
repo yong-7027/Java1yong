@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-public class jdbcDemo {
+/*public class jdbcDemo {
     public static void main(String[] args) throws Exception {
         // 注册驱动
         Class.forName("com.mysql.jdbc.Driver");
@@ -33,4 +33,4 @@ public class jdbcDemo {
         stmt.close();
         conn.close();
     }
-}
+}*/

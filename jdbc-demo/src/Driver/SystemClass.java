@@ -5,10 +5,16 @@ import cinema_management.Address;
 import cinema_management.Cinema;
 import genre_management.Genre;
 import hall_management.Hall;
-import movie_management.*;
+import movie_management.Movie;
+import movie_management.MovieUtils;
+import movie_management.MovieValidator;
+import movie_management.ShowDate;
+import timetable_management.TimeTable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -27,6 +33,104 @@ public class SystemClass {
 
     public SystemClass(Movie movie) {
         this.movie = movie;
+    }
+
+    public void customer(Scanner sc) throws Exception {
+        int choice = 0;
+        boolean error = true;
+
+        do {
+            try {
+                System.out.println("\nSelect the operation: ");
+                System.out.println("1. View Profile");
+                System.out.println("2. View Movie");
+                System.out.println("3. Search Movie");
+                System.out.println("4. Log out");
+
+                choice = sc.nextInt();
+                sc.nextLine();
+
+                if (choice > 0 && choice <= 4) {
+                    error = false;
+                }
+                else {
+                    System.out.println("Your choice is not among the available options! PLease try again.");
+                }
+            }
+            catch (InputMismatchException e) {
+                System.out.println("Please enter a valid choice!");
+                sc.nextLine();
+            }
+        } while (error);
+
+        switch (choice) {
+            case 1:
+                break;
+            case 2:
+                int periodSelected = 0;
+                error = true;
+
+                do {
+                    try {
+                        System.out.println("\nSelect the time period: ");
+                        System.out.println("1. Opening This Week");
+                        System.out.println("2. Coming Soon");
+                        periodSelected = sc.nextInt();
+                        sc.nextLine();
+
+                        if (periodSelected > 0 && periodSelected <= 2) {
+                            error = false;
+                        }
+                    }
+                    catch (InputMismatchException e) {
+                        System.out.println("Please enter a valid choice!");
+                        sc.nextLine();
+                    }
+                } while (error);
+
+                switch (periodSelected) {
+                    case 1:
+                        int movieSelected = 0;
+                        LocalDate currentDate = LocalDate.now();
+                        LocalDate oneWeekAgo = currentDate.minusWeeks(1);
+
+                        System.out.println("Opening This Week");
+                        ArrayList<Movie> moviesAfterFiltered = Movie.showMovieListAfterFiltered(oneWeekAgo, currentDate, 1);
+
+                        do {
+                            try {
+                                System.out.print("\nEnter the movie no (0 - Back): ");
+                                movieSelected = sc.nextInt();
+                                sc.nextLine();
+
+                                if (movieSelected == 0 || (movieSelected > 0 && movieSelected <= moviesAfterFiltered.size() && moviesAfterFiltered.get(movieSelected - 1).getStutus() == 1)) {
+                                    error = false;
+                                } else {
+                                    System.out.println("Your choice is not among the available options! PLease try again.");
+                                    error = true;
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid choice!");
+                                sc.nextLine();
+                                error = true;
+                            }
+                        } while (error);
+
+                        if (movieSelected != 0) {
+                            Movie viewMovie = moviesAfterFiltered.get(movieSelected - 1);
+                            viewMovie.viewMovieDetails();
+                        }
+                        break;
+                    case 2:
+                        break;
+                }
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+        }
+
     }
 
     public void manageCinema(Scanner sc) throws Exception {
@@ -246,7 +350,7 @@ public class SystemClass {
                         } while (error);
 
                         // Add Cinema
-                        newCinema.addCinema();
+                        newCinema.add();
 
                         String continueAddCinema;
                         do {
@@ -315,7 +419,7 @@ public class SystemClass {
                                         stop = true;
 
                                         if (save.equals("Y")) {
-                                            cinema.modifyCinema();
+                                            cinema.modify();
                                         } else {
                                             setCinema(orgCinema);
                                             System.out.println("\nThe changes have not been saved.");
@@ -539,7 +643,7 @@ public class SystemClass {
                             } while (delete.equals("Invalid"));
 
                             if (delete.equals("Y")) {
-                                cinema.deleteCinema();
+                                cinema.delete();
                             } else {
                                 System.out.println("\nThe cinema is safe :)");
                             }
@@ -876,11 +980,33 @@ public class SystemClass {
                 case 1:
                     // View Movie
                     do {
-                        int choice1 = Movie.viewMovieList(1, sc);
+                        int choice1 = 0;
+                        ArrayList<Movie> moviesAfterFiltered = Movie.showMovieListAfterFiltered(null, null, 1);
+
+                        do {
+                            try {
+                                System.out.print("\nEnter the movie no (0 - Back): ");
+                                choice1 = sc.nextInt();
+                                sc.nextLine();
+
+                                if (choice1 == 0 || (choice1 > 0 && choice1 <= moviesAfterFiltered.size() && moviesAfterFiltered.get(choice1 - 1).getStutus() == 1)) {
+                                    error = false;
+                                }
+                                else {
+                                    System.out.println("Your choice is not among the available options! PLease try again.");
+                                    error = true;
+                                }
+                            }
+                            catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid choice!");
+                                sc.nextLine();
+                                error = true;
+                            }
+                        } while (error);
 
                         if (choice1 != 0) {
-                            Movie viewMovie = movies.get(choice1 - 1);
-                            viewMovie.movieDetail();
+                            Movie viewMovie = moviesAfterFiltered.get(choice1 - 1);
+                            viewMovie.viewMovieDetails();
 
                             String continueViewMovie;
                             do {
@@ -958,7 +1084,8 @@ public class SystemClass {
                                     String errorMessage = MovieValidator.checkGenreID(genreID.size(), genreSelected);
 
                                     if (errorMessage == null) {
-                                        newMovie.setGenreID(genreID.get(genreSelected - 1));  // ArrayList starts from index 0
+                                        Genre genre = new Genre(genreID.get(genreSelected - 1));
+                                        newMovie.setGenre(genre);  // ArrayList starts from index 0
                                         error = false;
                                     }
                                     else {
@@ -1093,7 +1220,7 @@ public class SystemClass {
                         double mvAdultTicketPrice = Movie.getTicketPrice(sc, "adult");
                         newMovie.setAdultTicketPrice(mvAdultTicketPrice);
 
-                        newMovie.addMovie();
+                        newMovie.add();
 
                         String addMovie;
                         do {
@@ -1113,13 +1240,35 @@ public class SystemClass {
                     } while (back);
                     break;
                 case 3:
+                    ArrayList<Movie> moviesAfterFiltered;
+                    int movieID = 1;
+
                     do {
                         System.out.println("\nSelect the movie you want to modify: ");
-                        int choice2 = Movie.viewMovieList(1, sc);
+                        moviesAfterFiltered = Movie.showMovieListAfterFiltered(null, null, 1);
 
-                        if (choice2 != 0) {
-                            Movie orgMovie = movies.get(choice2 - 1);
-                            movie = new Movie(orgMovie.getGenreID(), orgMovie.getMvName(), orgMovie.getReleaseDate(), orgMovie.getDuration(), orgMovie.getLang(), orgMovie.getDirector(), orgMovie.getWritter(), orgMovie.getStarring(), orgMovie.getMusicProvider(), orgMovie.getCountry(), orgMovie.getMetaDescription(), orgMovie.getChildTicketPrice(), orgMovie.getAdultTicketPrice());
+                        do {
+                            try {
+                                System.out.print("\nEnter the movie id (0 - Back): ");
+                                movieID = sc.nextInt();
+                                sc.nextLine();
+
+                                if (movieID == 0 || (movieID > 0 && movieID <= moviesAfterFiltered.size() && moviesAfterFiltered.get(movieID - 1).getStutus() == 1)) {
+                                    error = false;
+                                } else {
+                                    System.out.println("Your choice is not among the available options! PLease try again.");
+                                    error = true;
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid movie id!");
+                                sc.nextLine();
+                                error = true;
+                            }
+                        } while (error);
+
+                        if (movieID != 0) {
+                            Movie orgMovie = moviesAfterFiltered.get(movieID - 1);
+                            movie = new Movie(orgMovie.getGenre(), orgMovie.getMvName(), orgMovie.getReleaseDate(), orgMovie.getDuration(), orgMovie.getLang(), orgMovie.getDirector(), orgMovie.getWritter(), orgMovie.getStarring(), orgMovie.getMusicProvider(), orgMovie.getCountry(), orgMovie.getMetaDescription(), orgMovie.getChildTicketPrice(), orgMovie.getAdultTicketPrice());
                             boolean stop = true;
 
                             do {
@@ -1139,7 +1288,7 @@ public class SystemClass {
                                         stop = false;
 
                                         if (save.equals("Y")) {
-                                            movie.modifyMovie();
+                                            movie.modify();
                                         }
                                         else {
                                             setMovie(orgMovie);
@@ -1199,7 +1348,8 @@ public class SystemClass {
                                                     String errorMessage = MovieValidator.checkGenreID(genreID.size(), newGenre);
 
                                                     if (errorMessage == null) {
-                                                        movie.setGenreID(genreID.get(newGenre - 1));  // ArrayList starts from index 0
+                                                        Genre genre = new Genre(genreID.get(newGenre - 1));
+                                                        movie.setGenre(genre);  // ArrayList starts from index 0
                                                         error = false;
                                                     } else {
                                                         System.out.println(errorMessage);
@@ -1353,12 +1503,33 @@ public class SystemClass {
                     } while (back);
                     break;
                 case 4:
+                    movieID = 0;
                     do {
                         System.out.println("\nSelect the movie you want to delete: ");
-                        int choice3 = Movie.viewMovieList(1, sc);
-                        if (choice3 != 0) {
-                            movie = movies.get(choice3 - 1);
-                            movie.movieDetail();
+                        moviesAfterFiltered = Movie.showMovieListAfterFiltered(null, null, 1);
+
+                        do {
+                            try {
+                                System.out.print("\nEnter the movie id (0 - Back): ");
+                                movieID = sc.nextInt();
+                                sc.nextLine();
+
+                                if (movieID == 0 || (movieID > 0 && movieID <= moviesAfterFiltered.size() && moviesAfterFiltered.get(movieID - 1).getStutus() == 1)) {
+                                    error = false;
+                                } else {
+                                    System.out.println("Your choice is not among the available options! PLease try again.");
+                                    error = true;
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid movie id!");
+                                sc.nextLine();
+                                error = true;
+                            }
+                        } while (error);
+
+                        if (movieID != 0) {
+                            movie = moviesAfterFiltered.get(movieID - 1);
+                            movie.viewMovieDetails();
                             String delete;
                             do {
                                 System.out.println("\nDo you want to delete this movie? (Y / N)");
@@ -1370,7 +1541,7 @@ public class SystemClass {
                             } while (delete.equals("Invalid"));
 
                             if (delete.equals("Y")) {
-                                movie.deleteMovie();
+                                movie.delete();
                             }
                             else {
                                 System.out.println("\nThe movie is saved.");
@@ -1448,7 +1619,7 @@ public class SystemClass {
                             }
                         } while (error);
 
-                        newGenre.addGenre();
+                        newGenre.add();
 
                         String addGenre;
                         do {
@@ -1530,7 +1701,7 @@ public class SystemClass {
                                         } while (save.equals("Invalid"));
 
                                         if (save.equals("Y")) {
-                                            genre.modifyGenre();
+                                            genre.modify();
                                         } else {
                                             genre.setGenreName(orgGenre.getGenreName());
                                             System.out.println("\nThe changes have not been saved.");
@@ -1605,7 +1776,7 @@ public class SystemClass {
                                 } while (delete.equals("Invalid"));
 
                                 if (delete.equals("Y")) {
-                                    genre.deleteGenre();
+                                    genre.delete();
                                 } else {
                                     System.out.println("\nThe genre is safe :)");
                                 }
@@ -1635,6 +1806,393 @@ public class SystemClass {
                             back = false;
                         }
                     } while (continues);
+                    break;
+            }
+        } while (back == false);
+    }
+
+    public void manageSchedule(Scanner sc) throws Exception {
+        boolean back = false;
+
+        do {
+            int choice = displayMenu("Schedule", sc);
+            boolean error = true;
+
+            switch (choice) {
+                case 0:
+                    back = true;
+                    break;
+                case 1:
+                    ArrayList<TimeTable> viewTimeTables = TimeTable.viewSchedule(sc);
+                    break;
+                case 2:
+                    TimeTable newSchedule = new TimeTable();
+
+                    ArrayList<Movie> moviesAfterFiltered;
+                    int movieID = 1, hallID = 1;
+                    error = true;
+
+                    do {
+                        moviesAfterFiltered = Movie.viewMovieListByFilter(sc);
+
+                        if (moviesAfterFiltered != null) {
+                            do {
+                                try {
+                                    System.out.print("\nEnter the movie id (0 - Back): ");
+                                    movieID = sc.nextInt();
+                                    sc.nextLine();
+
+                                    if (movieID == 0 || (movieID > 0 && movieID <= moviesAfterFiltered.size() && moviesAfterFiltered.get(movieID - 1).getStutus() == 1)) {
+                                        error = false;
+                                    } else {
+                                        System.out.println("Your choice is not among the available options! PLease try again.");
+                                        error = true;
+                                    }
+                                } catch (InputMismatchException e) {
+                                    System.out.println("Please enter a valid movie id!");
+                                    sc.nextLine();
+                                    error = true;
+                                }
+                            } while (error);
+                        }
+                    } while (movieID == 0 && moviesAfterFiltered != null);
+
+                    if (movieID != 0 && moviesAfterFiltered != null) {
+                        newSchedule.setMovie(moviesAfterFiltered.get(movieID - 1));
+
+                        // Cinema
+                        int cinemaNo = 0;
+                        error = true;
+                        ArrayList<Cinema> cinemas = new ArrayList<>();
+                        do {
+                            try {
+                                System.out.print("\nSelect the cinema you want to view the schedule: ");
+                                cinemas = Cinema.viewCinemaList(1);
+                                System.out.print("\nEnter the cinema no: ");
+                                cinemaNo = sc.nextInt();
+                                sc.nextLine();
+
+                                if (cinemaNo > 0 && cinemaNo <= cinemas.size() && cinemas.get(cinemaNo - 1).getStatus() == 1) {
+                                    error = false;
+                                } else {
+                                    System.out.println("Your choice is not among the available options! PLease try again.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid cinema no!");
+                                sc.nextLine();
+                            }
+                        } while (error);
+
+                        // Hall
+                        int hallNo = 0;
+                        error = true;
+                        ArrayList<Hall> halls = new ArrayList<>();
+                        do {
+                            try {
+                                System.out.println("\nSelect the hall: ");
+                                halls = cinemas.get(cinemaNo - 1).viewHallList(1);
+                                System.out.print("\nEnter the hall no: ");
+                                hallNo = sc.nextInt();
+                                sc.nextLine();
+
+                                if (hallNo > 0 && hallNo <= halls.size() && halls.get(hallNo - 1).getStatus() == 1) {
+                                    error = false;
+                                } else {
+                                    System.out.println("Your choice is not among the available options! PLease try again.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.out.println("Please enter a valid hall no!");
+                                sc.nextLine();
+                            }
+                        } while (error);
+
+                        newSchedule.setHall(halls.get(hallNo - 1));
+
+                        // Show Date
+                        error = true;
+                        String date = null;
+                        ShowDate addDate = null;
+                        boolean validDate = false;
+                        do {
+                            System.out.print("\nEnter movie show date (YYYY-MM-DD): ");
+                            date = sc.nextLine();
+
+                            if (date.trim().isEmpty()) {
+                                System.out.println("Please enter the show date.");
+                            } else {
+                                try {
+                                    String[] parts = date.split("-");
+                                    int year = Integer.parseInt(parts[0]);  // Java's built-in method for converting strings to integers (int type)
+                                    int month = Integer.parseInt(parts[1]);
+                                    int day = Integer.parseInt(parts[2]);
+
+                                    // 验证日期是否 valid
+                                    addDate = new ShowDate(year, month, day);
+                                    validDate = addDate.isValidDate();
+
+                                    if (validDate == true) {
+                                        String errorMessage = addDate.checkLocalDate();
+                                        if (errorMessage == null) {
+                                            newSchedule.setShowDate(addDate);
+                                            error = false;
+                                        } else {
+                                            System.out.println(errorMessage);
+                                        }
+                                    } else {
+                                        System.out.println("Please enter a valid date!");
+                                        error = true;
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("The date format entered in wrong!");
+                                }
+                            }
+                        } while (error);
+
+                        LocalTime[] selectedTimeSlots = newSchedule.availableTimeSlots(sc);
+                        newSchedule.setStartTime(selectedTimeSlots[0]);
+                        newSchedule.setEndTime(selectedTimeSlots[1]);
+
+                        // Add schedule
+                        newSchedule.add();
+                    }
+                    back = false;
+                    break;
+                case 3:
+                    // Modify Schedule
+                    error = true;
+                    int scheduleNo = 0;
+                    ArrayList<TimeTable> timeTables = TimeTable.viewSchedule(sc);
+                    do {
+                        try {
+                            System.out.print("\nEnter the schedule no. you want to modify (0 - Back): ");
+                            scheduleNo = sc.nextInt();
+                            sc.nextLine();
+
+                            if (scheduleNo < 0 || scheduleNo > timeTables.size()) {
+                                System.out.println("Your choice is not among the available options! PLease try again.");
+                            }
+                            else {
+                                error = false;
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid schedule no.");
+                            sc.nextLine();
+                        }
+                    } while (error);
+
+                    TimeTable modifySchedule = new TimeTable(timeTables.get(scheduleNo - 1).getTimetableID(), timeTables.get(scheduleNo - 1).getMovie(), timeTables.get(scheduleNo - 1).getHall(), timeTables.get(scheduleNo - 1).getShowDate(), timeTables.get(scheduleNo - 1).getStartTime());
+
+                    error = true;
+                    int choice2 = 0;
+                    do {
+                        try {
+                            System.out.println("\nSelect the operation:");
+                            System.out.println("1. Modify the movie show time");
+                            System.out.println("2. Modify the movie show date");
+                            System.out.println("3. Modify the movie to be played");
+                            System.out.println("4. Modify the location of the movie to be played");
+                            System.out.print("\nEnter your selection (0 - Back): ");
+                            choice2 = sc.nextInt();
+                            sc.nextLine();
+
+                            if (choice2 < 0 || choice2 > 4) {
+                                System.out.println("Your choice is not among the available options! PLease try again.");
+                            } else {
+                                error = false;
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid operation no.");
+                            sc.nextLine();
+                        }
+                    } while (error);
+
+                    switch (choice2) {
+                        case 1:
+                            // 时间调整
+                            LocalTime[] selectedTimeSlots = modifySchedule.availableTimeSlots(sc);
+                            modifySchedule.setStartTime(selectedTimeSlots[0]);
+                            modifySchedule.setEndTime(selectedTimeSlots[1]);
+
+                            modifySchedule.modify();
+                            break;
+                        case 2:
+                            // 日期调整
+                            error = true;
+                            String date;
+                            ShowDate modifyDate = null;  // Store the old show date
+                            boolean validDate;
+
+                            do {
+                                System.out.print("\nEnter the new movie show date (YYYY-MM-DD): ");
+                                date = sc.nextLine();
+
+                                if (date.trim().isEmpty()) {
+                                    System.out.println("Please enter the show date.");
+                                } else {
+                                    try {
+                                        String[] parts = date.split("-");
+                                        int year = Integer.parseInt(parts[0]);  // Java's built-in method for converting strings to integers (int type)
+                                        int month = Integer.parseInt(parts[1]);
+                                        int day = Integer.parseInt(parts[2]);
+
+                                        // 验证日期是否 valid
+                                        modifyDate = new ShowDate(year, month, day);
+                                        validDate = modifyDate.isValidDate();
+
+                                        if (validDate == true) {
+                                            String errorMessage = modifyDate.checkLocalDate();
+
+                                            if (errorMessage == null) {
+                                                modifySchedule.setShowDate(modifyDate);
+                                                error = false;
+                                            } else {
+                                                System.out.println(errorMessage);
+                                                error = true;
+                                            }
+                                        } else {
+                                            System.out.println("Please enter a valid date!");
+                                            error = true;
+                                        }
+                                    } catch (Exception e) {
+                                        System.out.println("The date format entered in wrong!");
+                                    }
+                                }
+                            } while (error);
+
+                            // 时间调整
+                            selectedTimeSlots = modifySchedule.availableTimeSlots(sc);
+                            modifySchedule.setStartTime(selectedTimeSlots[0]);
+                            modifySchedule.setEndTime(selectedTimeSlots[1]);
+
+                            modifySchedule.modify();
+                            break;
+                        case 3:
+                            // Modify the movie to be played
+                            movieID = 1;
+                            do {
+                                moviesAfterFiltered = Movie.viewMovieListByFilter(sc);
+
+                                if (moviesAfterFiltered != null) {
+                                    do {
+                                        try {
+                                            System.out.print("\nEnter the movie id (0 - Back): ");
+                                            movieID = sc.nextInt();
+                                            sc.nextLine();
+
+                                            if (movieID == 0 || (movieID > 0 && movieID <= moviesAfterFiltered.size() && moviesAfterFiltered.get(movieID - 1).getStutus() == 1)) {
+                                                error = false;
+                                            } else {
+                                                System.out.println("Your choice is not among the available options! PLease try again.");
+                                                error = true;
+                                            }
+                                        } catch (InputMismatchException e) {
+                                            System.out.println("Please enter a valid movie id!");
+                                            sc.nextLine();
+                                            error = true;
+                                        }
+                                    } while (error);
+                                }
+                            } while (movieID == 0 && moviesAfterFiltered != null);
+
+                            if (movieID != 0 && moviesAfterFiltered != null) {
+
+                                modifySchedule.setMovie(moviesAfterFiltered.get(movieID - 1));
+
+                                // 日期调整
+                                error = true;
+                                modifyDate = null;  // Store the old show date
+
+                                do {
+                                    System.out.print("\nEnter the new movie show date (YYYY-MM-DD): ");
+                                    date = sc.nextLine();
+
+                                    if (date.trim().isEmpty()) {
+                                        System.out.println("Please enter the show date.");
+                                    } else {
+                                        try {
+                                            String[] parts = date.split("-");
+                                            int year = Integer.parseInt(parts[0]);  // Java's built-in method for converting strings to integers (int type)
+                                            int month = Integer.parseInt(parts[1]);
+                                            int day = Integer.parseInt(parts[2]);
+
+                                            // 验证日期是否 valid
+                                            modifyDate = new ShowDate(year, month, day);
+                                            validDate = modifyDate.isValidDate();
+
+                                            if (validDate == true) {
+                                                String errorMessage = modifyDate.checkLocalDate();
+
+                                                if (errorMessage == null) {
+                                                    modifySchedule.setShowDate(modifyDate);
+                                                    error = false;
+                                                } else {
+                                                    System.out.println(errorMessage);
+                                                    error = true;
+                                                }
+                                            } else {
+                                                System.out.println("Please enter a valid date!");
+                                                error = true;
+                                            }
+                                        } catch (Exception e) {
+                                            System.out.println("The date format entered in wrong!");
+                                        }
+                                    }
+                                } while (error);
+
+                                // 时间调整
+                                selectedTimeSlots = modifySchedule.availableTimeSlots(sc);
+                                modifySchedule.setStartTime(selectedTimeSlots[0]);
+                                modifySchedule.setEndTime(selectedTimeSlots[1]);
+
+                                modifySchedule.modify();
+                            }
+                            break;
+                        case 4:
+                            break;
+                    }
+                    back = false;
+                    break;
+                case 4:
+                    timeTables = TimeTable.viewSchedule(sc);
+                    scheduleNo = 1;
+                    String delete;
+
+                    do {
+                        try {
+                            System.out.print("\nEnter the schedule no. you want to delete (0 - Back): ");
+                            scheduleNo = sc.nextInt();
+                            sc.nextLine();
+
+                            if (scheduleNo < 0 || scheduleNo > timeTables.size()) {
+                                System.out.println("Your choice is not among the available options! PLease try again.");
+                            }
+                            else {
+                                error = false;
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Please enter a valid schedule no.");
+                            sc.nextLine();
+                        }
+                    } while (error);
+
+                    TimeTable deleteSchedule = new TimeTable(timeTables.get(scheduleNo - 1).getTimetableID(), timeTables.get(scheduleNo - 1).getMovie(), timeTables.get(scheduleNo - 1).getHall(), timeTables.get(scheduleNo - 1).getShowDate(), timeTables.get(scheduleNo - 1).getStartTime());
+
+                    do {
+                        System.out.println("\nDo you want to delete this schedule? (Y / N)");
+                        System.out.print("Answer: ");
+                        String answer = sc.next();
+                        sc.nextLine();
+
+                        delete = MovieUtils.askForContinue(answer);
+                    } while (delete.equals("Invalid"));
+
+                    if (delete.equals("Y")) {
+                        deleteSchedule.delete();
+                    }
+                    else {
+                        System.out.println("\nThe schedule is saved.");
+                    }
+                    back = false;
                     break;
             }
         } while (back == false);

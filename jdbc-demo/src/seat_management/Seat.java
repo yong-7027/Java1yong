@@ -199,7 +199,12 @@ public class Seat {
         System.out.printf("test:OK");
         return 0;
     }
-
+    public static boolean checkSeatValidation(int row,int col){
+        if(row>=1&&row<=8&&col>=1&&col<=8)
+            return true;
+        else
+            return false;
+    }
 
 
 }

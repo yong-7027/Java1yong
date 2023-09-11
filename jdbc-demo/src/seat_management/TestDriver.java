@@ -2,15 +2,22 @@ package seat_management;
 
 import Connect.DatabaseUtils;
 import Driver.Name;
+import Driver.SystemClass;
 import booking_management.Booking;
 import hall_management.Hall;
 import movie_management.Movie;
 import movie_management.ShowDate;
+import ticket_managemnet.AdultTicket;
 import ticket_managemnet.ChildTicket;
 import ticket_managemnet.Ticket;
+import timetable_management.TimeTable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class TestDriver {
     public static void main(String[] args) throws Exception {
@@ -69,16 +76,38 @@ public class TestDriver {
 //
 //        System.out.println("结果是：" + num); // 输出结果
 
-
-
+        Scanner sc = new Scanner(System.in);
+        SystemClass sclass = new SystemClass();
+        sclass.customer(sc);
         Seat.viewSeat_status(1);
         Hall hall=new Hall();
-        //hall.setHallID(3);
+        hall.setHallID(1);
+        Movie movie = new Movie();
+        Name name = new Name();
+        name.setName("Pokemon");
+        movie.setMvName(name);
+        ShowDate sd=new ShowDate(LocalDate.of(2023,4,22));
+
+
+
         Seat newseat=new Seat("1A3",hall,1,3,1);
         //newseat.addSeat();
         Booking booking=new Booking(1,0,0,0,1);
 //        booking.addBooking();
-        ChildTicket ticket=new ChildTicket(1,newseat,booking,"Child");
-        ticket.addTicket();
+        AdultTicket ticket=new AdultTicket(3,newseat,booking,"Adult");
+        //ticket.addTicket();
+
+
+        ArrayList<Ticket> tickets=Ticket.getBookedTicketList(3);
+        for(Ticket t:tickets){
+            System.out.println(t.getSeat().getSeat_id());
+        }
+
+
+        TimeTable schedule=new TimeTable(3,movie,hall,sd, LocalTime.of(11,0,0));
+
+//---------Start here----------------------------------------------------------------------------------------------------------------------
+        Booking.viewSeat_status(schedule);
+        booking.executeBooking(schedule);
     }
 }

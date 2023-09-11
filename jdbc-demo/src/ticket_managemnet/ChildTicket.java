@@ -30,6 +30,11 @@ public class ChildTicket extends Ticket{
 //        this.ticketType = ticketType;
 //    }
 
+
+    public ChildTicket(String ticketType) {
+        this.ticketType = ticketType;
+    }
+
     public ChildTicket(int ticket_id, Seat seat, Booking booking, String ticketType) {
         super(ticket_id, seat, booking);
         this.ticketType = ticketType;

@@ -6,31 +6,20 @@ public class MovieUtils {
     private MovieUtils(){
     }
 
-    public static Movie queryMovie(ArrayList<CustomerMovie> movies, String mvName){
+    public static ArrayList<Movie> queryMovieByName(ArrayList<Movie> movies, String mvName){
+        ArrayList<Movie> searchResults = new ArrayList<>();
+
+        String userInput = mvName.toLowerCase();
+
         for (int i = 0; i < movies.size(); i++) {
             Movie movie = movies.get(i);
-            String name = movie.getMvName().getName().toUpperCase();
+            String name = movie.getMvName().getName().toLowerCase();
 
-            if (name.equals(mvName)) {
-                return movie;
+            if (name.contains(userInput)) {
+                searchResults.add(movie);
             }
         }
-        return null;
-    }
-
-    public static String askForContinue(String answer){
-        answer = answer.toUpperCase();
-
-        if (answer.equals("Y") || answer.equals("YES")) {
-            return "Y";
-        }
-        else if (answer.equals("N") || answer.equals("NO")) {
-            return "N";
-        }
-        else {
-            System.out.println("Please enter Y / N.");
-            return "Invalid";
-        }
+        return searchResults;
     }
 
     // Format double data type value to two decimal point

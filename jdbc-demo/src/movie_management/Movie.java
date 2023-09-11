@@ -3,6 +3,7 @@ package movie_management;
 import Connect.DatabaseUtils;
 import Driver.CrudOperations;
 import Driver.Name;
+import Driver.SystemClass;
 import genre_management.Genre;
 
 import java.sql.ResultSet;
@@ -239,7 +240,6 @@ public class Movie implements CrudOperations {
             ResultSet result = DatabaseUtils.selectQueryById("*", "movie", "movie_status = ?", params);
 
             while (result.next()) {
-                //Movie movie = new Movie(id, mvName, releaseDate, duration, lang, director, writter, starring, musicProvider, country, metaDescription, childTicketPrice, adultTicketPrice);
                 Movie movie = new Movie();
 
                 movie.setMovieID(result.getInt("movie_id"));
@@ -272,22 +272,29 @@ public class Movie implements CrudOperations {
 
         System.out.printf("\n%-5s %s\n", "No", "Movie Name");
 
+        int countFuture = 1;
+        int countAll = 1;
+        int countOther = 1;
+
         for (int i = 0; i < movies.size(); i++) {
             LocalDate localReleaseDate = movies.get(i).getReleaseDate().getDate();
 
             if (expectedDate != null && currentDate == null) {  // Future Movie(s)
                 if (localReleaseDate.equals(expectedDate) || localReleaseDate.isAfter(expectedDate)) {
-                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
+                    System.out.printf("%-5d %s\n", countFuture, movies.get(i).getMvName().getName());
                     moviesAfterFiltered.add(movies.get(i));
+                    countFuture++;
                 }
             } else if (expectedDate == null && currentDate == null) {  // All Movies
-                System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
+                System.out.printf("%-5d %s\n", countAll, movies.get(i).getMvName().getName());
                 moviesAfterFiltered.add(movies.get(i));
+                countAll++;
             }
             else {
                 if (localReleaseDate.equals(expectedDate) || (localReleaseDate.isAfter(expectedDate) && localReleaseDate.isBefore(currentDate))) {
-                    System.out.printf("%-5d %s\n", movies.get(i).getMovieID(), movies.get(i).getMvName().getName());
+                    System.out.printf("%-5d %s\n", countOther, movies.get(i).getMvName().getName());
                     moviesAfterFiltered.add(movies.get(i));
+                    countOther++;
                 }
             }
         }
@@ -323,7 +330,7 @@ public class Movie implements CrudOperations {
                     String answer = sc.next();
                     sc.nextLine();
 
-                    continues = MovieUtils.askForContinue(answer);
+                    continues = SystemClass.askForContinue(answer);
 
                 } while (continues.equals("Invalid"));
 

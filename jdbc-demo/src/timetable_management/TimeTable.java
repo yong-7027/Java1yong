@@ -12,6 +12,7 @@ import movie_management.ShowDate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -78,7 +79,12 @@ public class TimeTable implements CrudOperations {
         do {
             try {
                 System.out.println("\nSelect the hall: ");
-                halls = cinemas.get(cinemaNo - 1).viewHallList(1);
+                halls = cinemas.get(cinemaNo - 1).getHallList(1);
+
+                for (int i = 0; i < halls.size(); i++) {
+                    System.out.println((i + 1) + ". " + halls.get(i).getHallName().getName());
+                }
+
                 System.out.print("\nEnter the hall no: ");
                 hallNo = sc.nextInt();
                 sc.nextLine();
@@ -246,6 +252,46 @@ public class TimeTable implements CrudOperations {
         }
     }
 
+    public static ArrayList<LocalDate> generateOneWeekDateList() {
+        ArrayList<LocalDate> dateList = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now(); // 获取当前日期
+
+        // 生成一周内的日期
+        for (int i = 0; i <= 6; i++) { // 一周有7天
+            dateList.add(currentDate);  // 将日期添加到列表中
+            System.out.println((i + 1) + ". " + dateList.get(i));
+            currentDate = currentDate.plusDays(1); // 增加一天
+        }
+
+        return dateList;
+    }
+
+    public int showHallAndTime(int count, ArrayList<TimeTable> timeTables) throws SQLException {
+        ResultSet result = null;
+        try {
+            Object[] params = {hall.getHallID(), String.valueOf(showDate.getDate()), 1};
+            result = DatabaseUtils.selectQueryById("movie_startTime, movie_endTime", "timeTable", "hall_id = ? AND movie_showDate = ? AND timeTable_status = ?", params);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        while (result.next()) {
+            TimeTable timeTable = new TimeTable();
+
+            timeTable.startTime = result.getTime("movie_startTime").toLocalTime();
+            timeTable.endTime = result.getTime("movie_endTime").toLocalTime();
+            timeTable.setHall(hall);
+
+            timeTables.add(timeTable);
+
+            System.out.printf(count + ". %-20s %17s %17s\n", hall.getHallName().getName(), timeTable.startTime, timeTable.endTime);
+            count++;
+        }
+
+        return count;
+    }
+
     public void calculateEndTime(Movie movie, LocalTime startTime){
         // Change the duration's data type from int to Duration (in minutes)
         Duration duration = Duration.ofMinutes(movie.getDuration());
@@ -351,6 +397,17 @@ public class TimeTable implements CrudOperations {
         } while (error);
 
         return availableTimeSlots.get(choice - 1);
+    }
+
+    public String checkShowDate(){
+        int comparison = showDate.getDate().compareTo(movie.getReleaseDate().getDate()); // Compare dates
+
+        if (comparison <= 0) {
+            return "The show date cannot be earlier than or equal to release date.";
+        }
+        else {
+            return null;
+        }
     }
 
     // Setter

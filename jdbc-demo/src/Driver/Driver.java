@@ -19,7 +19,10 @@ public class Driver {
         //AdminGenre.adminGenre(sc);
         //AdminTimeTable.adminTimeTable(sc);
 
-        System.out.println("Select the operation:");
+        SystemClass testing = new SystemClass();
+        testing.customer(sc);
+
+        System.out.println("\nSelect the operation:");
         System.out.println("1. Manage Cinema");
         System.out.println("2. Manage Hall");
         System.out.println("3. Manage Movie");

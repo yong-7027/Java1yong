@@ -28,7 +28,7 @@ public class Movie implements CrudOperations {
     private String metaDescription;
     private double childTicketPrice;
     private double adultTicketPrice;
-    private int stutus;
+    private int status;
     private static ArrayList<Movie> movies = new ArrayList<>();
 
     public Movie(){
@@ -529,7 +529,7 @@ public class Movie implements CrudOperations {
     }
 
     public void setStutus(int stutus) {
-        this.stutus = stutus;
+        this.status = stutus;
     }
 
     public int getMovieID() {
@@ -589,7 +589,7 @@ public class Movie implements CrudOperations {
     }
 
     public int getStutus() {
-        return stutus;
+        return status;
     }
 
     public static ArrayList<Movie> getAllMovies() {

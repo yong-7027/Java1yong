@@ -279,6 +279,7 @@ public class TimeTable implements CrudOperations {
         while (result.next()) {
             TimeTable timeTable = new TimeTable();
 
+            timeTable.timetableID = result.getInt("schedule_id");
             timeTable.startTime = result.getTime("movie_startTime").toLocalTime();
             timeTable.endTime = result.getTime("movie_endTime").toLocalTime();
             timeTable.setHall(hall);

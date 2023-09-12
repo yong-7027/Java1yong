@@ -235,6 +235,7 @@ public class SystemClass {
                                                 sc.nextLine();
 
                                                 if (scheduleSelected > 0 && scheduleSelected <= timeTables.size()) {
+                                                    timeTable.setTimetableID(timeTables.get(scheduleSelected - 1).getTimetableID());
                                                     timeTable.setHall(timeTables.get(scheduleSelected - 1).getHall());
                                                     timeTable.setStartTime(timeTables.get(scheduleSelected - 1).getStartTime());
                                                     timeTable.setEndTime(timeTables.get(scheduleSelected - 1).getEndTime());

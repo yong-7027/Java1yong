@@ -20,22 +20,10 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class SystemClass {
-    private Cinema cinema;
-    private Movie movie;
-    private Genre genre;
-
     public SystemClass(){
     }
 
-    public SystemClass(Cinema cinema) {
-        this.cinema = cinema;
-    }
-
-    public SystemClass(Movie movie) {
-        this.movie = movie;
-    }
-
-    public void customer(Scanner sc) throws Exception {
+    public void run(Scanner sc) throws Exception {
         int choice = 0;
         boolean error = true, back = false;
 
@@ -337,9 +325,8 @@ public class SystemClass {
                                 movie.setMusicProvider(result.getString("music"));
                                 movie.setCountry(result.getString("country"));
                                 movie.setMetaDescription(result.getString("meta_description"));
-                                movie.setChildTicketPrice(result.getDouble("childTicket_Price"));
-                                movie.setAdultTicketPrice(result.getDouble("adultTicket_Price"));
-                                movie.setStutus(result.getInt("movie_status"));
+                                movie.setBasicTicketPrice(result.getDouble("basic_TicketPrice"));
+                                movie.setStatus(result.getInt("movie_status"));
 
                                 moviesAfterFiltered.add(movie);
                             }
@@ -363,6 +350,36 @@ public class SystemClass {
                     break;
             }
         } while (back == false);
+
+        // Admin
+        System.out.println("\nSelect the operation:");
+        System.out.println("1. Manage Cinema");
+        System.out.println("2. Manage Hall");
+        System.out.println("3. Manage Movie");
+        System.out.println("4. Manage Genre");
+        System.out.println("5. Manage Schedule");
+        System.out.print("\nEnter your selection: ");
+
+        choice = sc.nextInt();
+        sc.nextLine();
+
+        switch (choice) {
+            case 1:
+                manageCinema(sc);
+                break;
+            case 2:
+                manageHall(sc);
+                break;
+            case 3:
+                manageMovie(sc);
+                break;
+            case 4:
+                manageGenre(sc);
+                break;
+            case 5:
+                manageSchedule(sc);
+                break;
+        }
     }
 
     public void manageCinema(Scanner sc) throws Exception {
@@ -631,7 +648,7 @@ public class SystemClass {
 
                         if (cinemaModified != 0) {
                             Cinema orgCinema = cinemasModified.get(cinemaModified - 1);
-                            cinema = new Cinema(orgCinema.getCinemaID(), orgCinema.getCinemaName(), orgCinema.getCinemaAddress(), orgCinema.getCinemaPhone());
+                            Cinema cinema = new Cinema(orgCinema.getCinemaID(), orgCinema.getCinemaName(), orgCinema.getCinemaAddress(), orgCinema.getCinemaPhone());
                             boolean stop = false;
 
                             do {
@@ -653,7 +670,7 @@ public class SystemClass {
                                         if (save.equals("Y")) {
                                             cinema.modify();
                                         } else {
-                                            setCinema(orgCinema);
+                                            cinema = orgCinema;
                                             System.out.println("\nThe changes have not been saved.");
                                         }
 
@@ -843,9 +860,9 @@ public class SystemClass {
                         ArrayList<Cinema> cinemasDeleted = new ArrayList<>();
                         do {
                             try {
-                                System.out.println("\nSelect the genre you want to delete: ");
+                                System.out.println("\nSelect the cinema you want to delete: ");
                                 cinemasDeleted = Cinema.viewCinemaList(1);
-                                System.out.print("\nEnter the genre no (0 - Back): ");
+                                System.out.print("\nEnter the cinema no (0 - Back): ");
                                 cinemaDeleted = sc.nextInt();
                                 sc.nextLine();
 
@@ -863,7 +880,7 @@ public class SystemClass {
                         } while (error);
 
                         if (cinemaDeleted != 0) {
-                            cinema = cinemasDeleted.get(cinemaDeleted - 1);
+                            Cinema cinema = cinemasDeleted.get(cinemaDeleted - 1);
                             String delete;
                             do {
                                 System.out.println("\nAre you sure you want to delete this cinema? (Y / N)");
@@ -908,9 +925,38 @@ public class SystemClass {
 
     public void manageHall(Scanner sc) throws Exception {
         boolean back = false;
+
+        ArrayList<Cinema> cinemas = Cinema.getCinemas();
+        int cinemaSelected = 0;
+        boolean error = true;
+
+        do {
+            try {
+                System.out.println("\nSelect the cinema you want to manage it's hall: ");
+                for (int i = 0; i < cinemas.size(); i++) {
+                    System.out.println((i + 1) + ". " + cinemas.get(i).getCinemaName().getName());
+                }
+                System.out.print("\nEnter your selection: ");
+                cinemaSelected = sc.nextInt();
+                sc.nextLine();
+
+                if (cinemaSelected > 0 && cinemaSelected <= cinemas.size()) {
+                    error = false;
+                }
+                else {
+                    System.out.println("Your choice is not among the available options! PLease try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid cinema no!");
+                sc.nextLine();
+            }
+        } while (error);
+
+        Cinema cinema = cinemas.get(cinemaSelected - 1);
+
         do {
             int choice = displayMenu("Hall", sc);
-            boolean error = true;
+            error = true;
 
             switch (choice) {
                 case 0:
@@ -1213,7 +1259,6 @@ public class SystemClass {
 
     public void manageMovie(Scanner sc) throws Exception {
         boolean back = false;
-        ArrayList<Movie> movies = Movie.getAllMovies();
 
         do {
             int choice = displayMenu("Movie", sc);
@@ -1442,6 +1487,10 @@ public class SystemClass {
                         String mvCountry = Movie.getMultipleChosens(sc, countries, "countries");
                         newMovie.setCountry(mvCountry);
 
+                        // Movie Basic Ticket Price
+                        double mvBasicTicketPrice = Movie.getTicketPrice(sc, "basic");
+                        newMovie.setBasicTicketPrice(mvBasicTicketPrice);
+
                         // Movie Meta Description
                         do {
                             System.out.print("\nEnter movie meta description: ");
@@ -1458,14 +1507,6 @@ public class SystemClass {
                                 error = true;
                             }
                         } while (error);
-
-                        // Movie Child Ticket Price
-                        double mvChildTicketPrice = Movie.getTicketPrice(sc, "child");
-                        newMovie.setChildTicketPrice(mvChildTicketPrice);
-
-                        // Movie Adult Ticket Price
-                        double mvAdultTicketPrice = Movie.getTicketPrice(sc, "adult");
-                        newMovie.setAdultTicketPrice(mvAdultTicketPrice);
 
                         newMovie.add();
 
@@ -1515,7 +1556,7 @@ public class SystemClass {
 
                         if (movieID != 0) {
                             Movie orgMovie = moviesAfterFiltered.get(movieID - 1);
-                            movie = new Movie(orgMovie.getGenre(), orgMovie.getMvName(), orgMovie.getReleaseDate(), orgMovie.getDuration(), orgMovie.getLang(), orgMovie.getDirector(), orgMovie.getWritter(), orgMovie.getStarring(), orgMovie.getMusicProvider(), orgMovie.getCountry(), orgMovie.getMetaDescription(), orgMovie.getChildTicketPrice(), orgMovie.getAdultTicketPrice());
+                            Movie movie = new Movie(orgMovie.getMovieID(), orgMovie.getGenre(), orgMovie.getMvName(), orgMovie.getReleaseDate(), orgMovie.getDuration(), orgMovie.getLang(), orgMovie.getDirector(), orgMovie.getWritter(), orgMovie.getStarring(), orgMovie.getMusicProvider(), orgMovie.getCountry(), orgMovie.getMetaDescription(), orgMovie.getBasicTicketPrice());
                             boolean stop = true;
 
                             do {
@@ -1538,7 +1579,7 @@ public class SystemClass {
                                             movie.modify();
                                         }
                                         else {
-                                            setMovie(orgMovie);
+                                            movie = orgMovie;
                                             System.out.println("\nThe changes have not been saved.");
                                         }
                                         back = false;
@@ -1714,6 +1755,12 @@ public class SystemClass {
                                         movie.setCountry(editMvCountry);
                                         break;
                                     case 11:
+                                        // Movie Basic Ticket Price
+                                        double editMvBasicTicketPrice = Movie.getTicketPrice(sc, "basic");
+                                        movie.setBasicTicketPrice(editMvBasicTicketPrice);
+                                        System.out.println(movie.getBasicTicketPrice());
+                                        break;
+                                    case 12:
                                         // Movie Meta Description
                                         do {
                                             System.out.print("\nEnter the new movie meta description: ");
@@ -1730,16 +1777,6 @@ public class SystemClass {
                                                 error = true;
                                             }
                                         } while (error);
-                                        break;
-                                    case 12:
-                                        // Movie Child Ticket Price
-                                        double editMvChildTicketPrice = movie.getTicketPrice(sc, "child");
-                                        movie.setChildTicketPrice(editMvChildTicketPrice);
-                                        break;
-                                    case 13:
-                                        // Movie Adult Ticket Price
-                                        double editMvAdultTicketPrice = movie.getTicketPrice(sc, "adult");
-                                        movie.setAdultTicketPrice(editMvAdultTicketPrice);
                                         break;
                                 }
                             } while (stop);
@@ -1775,7 +1812,7 @@ public class SystemClass {
                         } while (error);
 
                         if (movieID != 0) {
-                            movie = moviesAfterFiltered.get(movieID - 1);
+                            Movie movie = moviesAfterFiltered.get(movieID - 1);
                             movie.viewMovieDetails();
                             String delete;
                             do {
@@ -1898,7 +1935,7 @@ public class SystemClass {
 
                         if (genreModified != 0) {
                             Genre orgGenre = genres.get(genreModified - 1);
-                            genre = new Genre(orgGenre.getGenreID(), orgGenre.getGenreName(), orgGenre.getPost(), orgGenre.getStatus());
+                            Genre genre = new Genre(orgGenre.getGenreID(), orgGenre.getGenreName(), orgGenre.getPost(), orgGenre.getStatus());
                             Name name = null;
                             do {
                                 System.out.print("\nEnter the new genre name (0 - Back): ");
@@ -1997,7 +2034,7 @@ public class SystemClass {
                             int post = genres.get(genreDeleted - 1).getPost();
 
                             if (post == 0) {
-                                genre = genres.get(genreDeleted - 1);
+                                Genre genre = genres.get(genreDeleted - 1);
                                 String delete;
                                 do {
                                     System.out.println("\nAre you sure you want to delete this genre? (Y / N)");
@@ -2504,29 +2541,5 @@ public class SystemClass {
             System.out.println("Please enter Y / N.");
             return "Invalid";
         }
-    }
-
-    public void setCinema(Cinema cinema) {
-        this.cinema = cinema;
-    }
-
-    public void setMovie(Movie movie) {
-        this.movie = movie;
-    }
-
-    public void setGenre(Genre genre) {
-        this.genre = genre;
-    }
-
-    public Cinema getCinema() {
-        return cinema;
-    }
-
-    public Movie getMovie() {
-        return movie;
-    }
-
-    public Genre getGenre() {
-        return genre;
     }
 }

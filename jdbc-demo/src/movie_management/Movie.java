@@ -26,15 +26,14 @@ public class Movie implements CrudOperations {
     private String musicProvider;
     private String country;
     private String metaDescription;
-    private double childTicketPrice;
-    private double adultTicketPrice;
+    private double basicTicketPrice;
     private int status;
-    private static ArrayList<Movie> movies = new ArrayList<>();
 
     public Movie(){
     }
 
-    public Movie(Genre genre, Name mvName, ShowDate releaseDate, int duration, String lang, String director, String writter, String starring, String musicProvider, String country, String metaDescription, double childTicketPrice, double adultTicketPrice) {
+    public Movie(int movieID, Genre genre, Name mvName, ShowDate releaseDate, int duration, String lang, String director, String writter, String starring, String musicProvider, String country, String metaDescription, double basicTicketPrice) {
+        this.movieID = movieID;
         this.genre = genre;
         this.mvName = mvName;
         this.releaseDate = releaseDate;
@@ -46,47 +45,26 @@ public class Movie implements CrudOperations {
         this.musicProvider = musicProvider;
         this.country = country;
         this.metaDescription = metaDescription;
-        this.childTicketPrice = childTicketPrice;
-        this.adultTicketPrice = adultTicketPrice;
+        this.basicTicketPrice = basicTicketPrice;
     }
 
-    static {
+    // Show movie details
+    public void viewMovieDetails() throws SQLException {
+        ResultSet result = null;
+
         try {
-            ResultSet result = DatabaseUtils.selectQueryById("*", "movie", null, null);
-
-            while (result.next()) {
-                //Movie movie = new Movie(id, mvName, releaseDate, duration, lang, director, writter, starring, musicProvider, country, metaDescription, childTicketPrice, adultTicketPrice);
-                Movie movie = new Movie();
-
-                movie.setMovieID(result.getInt("movie_id"));
-                movie.setGenre(new Genre(result.getInt("genre_id")));
-                movie.setMvName(new Name(result.getString("mv_name")));
-                movie.setReleaseDate(new ShowDate(result.getDate("release_date").toLocalDate()));
-                movie.setDuration(result.getInt("duration"));
-                movie.setLang(result.getString("lang"));
-                movie.setDirector(result.getString("director"));
-                movie.setWritter(result.getString("writter"));
-                movie.setStarring(result.getString("starring"));
-                movie.setMusicProvider(result.getString("music"));
-                movie.setCountry(result.getString("country"));
-                movie.setMetaDescription(result.getString("meta_description"));
-                movie.setChildTicketPrice(result.getDouble("childTicket_Price"));
-                movie.setAdultTicketPrice(result.getDouble("adultTicket_Price"));
-
-                movies.add(movie);
-            }
-
-            result.close();
+            Object[] params = {getGenre().getGenreID()};
+            result = DatabaseUtils.selectQueryById("genre_name", "genre", "genre_id = ?", params);
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
-    }
 
-    // Show movie details
-    public void viewMovieDetails() {
         System.out.printf("\nMovie Detail:\n");
         System.out.println("Movie Name: " + getMvName().getName());
+        if (result.next()) {
+            System.out.println("Genre: " + result.getString("genre_name"));
+        }
         System.out.println("Release Date: " + getReleaseDate().getDate());
         System.out.println("Duration: " + getDuration() + " minutes");
         System.out.println("Language: " + getLang());
@@ -95,8 +73,7 @@ public class Movie implements CrudOperations {
         System.out.println("Starring: " + getStarring());
         System.out.println("Music Producer: " + getMusicProvider());
         System.out.println("Country: " + getCountry());
-        System.out.printf("%s %.2f\n", "Child Ticket Price:", getChildTicketPrice());
-        System.out.printf("%s %.2f\n", "Adult Ticket Price:", getAdultTicketPrice());
+        System.out.printf("%s %.2f\n", "Basic Ticket Price:", getBasicTicketPrice());
         System.out.println("\nSynopsis:\n" + getMetaDescription());
     }
 
@@ -104,8 +81,8 @@ public class Movie implements CrudOperations {
         int rowAffected = 0;
 
         try {
-            String insertSql = "INSERT INTO `movie`(`genre_id`, `mv_name`, `release_date`, `duration`, `lang`, `director`, `writter`, `starring`, `music`, `country`,`meta_description`, `childTicket_Price`, `adultTicket_Price`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            Object[] params = {getGenre().getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getChildTicketPrice(), getAdultTicketPrice()};
+            String insertSql = "INSERT INTO `movie`(`genre_id`, `mv_name`, `release_date`, `duration`, `lang`, `director`, `writter`, `starring`, `music`, `country`,`meta_description`, `basic_TicketPrice`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            Object[] params = {getGenre().getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getBasicTicketPrice()};
             rowAffected = DatabaseUtils.insertQuery(insertSql, params);
         }
         catch (SQLException e) {
@@ -127,9 +104,8 @@ public class Movie implements CrudOperations {
             String updateSql = "UPDATE `movie` SET `genre_id`= ?, `mv_name`= ?," +
                     "`release_date`= ?,`duration`= ?,`lang`= ?," +
                     "`director`= ?,`writter`= ?,`starring`= ?,`music`= ?," +
-                    "`country`= ?,`meta_description`= ?, `childTicket_Price`= ?," +
-                    "`adultTicket_Price`= ? WHERE movie_id = ?";
-            Object[] params = {getGenre().getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getChildTicketPrice(), getAdultTicketPrice(), getMovieID()};
+                    "`country`= ?,`meta_description`= ?, `basic_TicketPrice`= ? WHERE `movie_id` = ?";
+            Object[] params = {getGenre().getGenreID(), getMvName().getName(), String.valueOf(getReleaseDate().getDate()), getDuration(), getLang(), getDirector(), getWritter(), getStarring(), getMusicProvider(), getCountry(), getMetaDescription(), getBasicTicketPrice(), getMovieID()};
             rowAffected = DatabaseUtils.updateQuery(updateSql, params);
         }
         catch (SQLException e) {
@@ -255,9 +231,8 @@ public class Movie implements CrudOperations {
                 movie.setMusicProvider(result.getString("music"));
                 movie.setCountry(result.getString("country"));
                 movie.setMetaDescription(result.getString("meta_description"));
-                movie.setChildTicketPrice(result.getDouble("childTicket_Price"));
-                movie.setAdultTicketPrice(result.getDouble("adultTicket_Price"));
-                movie.setStutus(result.getInt("movie_status"));
+                movie.setBasicTicketPrice(result.getDouble("basic_TicketPrice"));
+                movie.setStatus(result.getInt("movie_status"));
 
                 movies.add(movie);
             }
@@ -444,11 +419,9 @@ public class Movie implements CrudOperations {
                     count++;
                     System.out.println(count + ". Country: " + getCountry());
                     count++;
+                    System.out.printf("%d. %s: %.2f\n", count, "Basic Ticket Price", getBasicTicketPrice());
+                    count++;
                     System.out.println("\n" + count + ". Synopsis:\n" + getMetaDescription() + "\n");
-                    count++;
-                    System.out.printf("%d. %s: %.2f\n", count, "Child Ticket Price", getChildTicketPrice());
-                    count++;
-                    System.out.printf("%d. %s: %.2f\n", count, "Adult Ticket Price", getAdultTicketPrice());
 
                     System.out.print("\nEnter the serial number of the movie information you want to change (0 - Stop): ");
                     int serialNum = sc.nextInt();
@@ -521,16 +494,12 @@ public class Movie implements CrudOperations {
         this.metaDescription = metaDescription;
     }
 
-    public void setChildTicketPrice(double childTicketPrice) {
-        this.childTicketPrice = childTicketPrice;
+    public void setBasicTicketPrice(double basicTicketPrice) {
+        this.basicTicketPrice = basicTicketPrice;
     }
 
-    public void setAdultTicketPrice(double adultTicketPrice) {
-        this.adultTicketPrice = adultTicketPrice;
-    }
-
-    public void setStutus(int stutus) {
-        this.status = stutus;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public int getMovieID() {
@@ -581,19 +550,11 @@ public class Movie implements CrudOperations {
         return metaDescription;
     }
 
-    public double getChildTicketPrice() {
-        return childTicketPrice;
+    public double getBasicTicketPrice() {
+        return basicTicketPrice;
     }
 
-    public double getAdultTicketPrice() {
-        return adultTicketPrice;
-    }
-
-    public int getStutus() {
+    public int getStatus() {
         return status;
-    }
-
-    public static ArrayList<Movie> getAllMovies() {
-        return movies;
     }
 }

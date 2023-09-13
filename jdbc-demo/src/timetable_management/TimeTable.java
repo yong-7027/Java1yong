@@ -175,8 +175,7 @@ public class TimeTable implements CrudOperations {
                 movie.setMusicProvider(result2.getString("music"));
                 movie.setCountry(result2.getString("country"));
                 movie.setMetaDescription(result2.getString("meta_description"));
-                movie.setChildTicketPrice(result2.getDouble("childTicket_Price"));
-                movie.setAdultTicketPrice(result2.getDouble("adultTicket_Price"));
+                movie.setBasicTicketPrice(result2.getDouble("basic_TicketPrice"));
             }
 
             TimeTable schedule = new TimeTable(timetableID, movie, halls.get(hallNo - 1), viewDate, startTime);

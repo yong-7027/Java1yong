@@ -1,6 +1,7 @@
 package Driver;
 
 import Connect.DatabaseUtils;
+import booking_management.Booking;
 import cinema_management.Address;
 import cinema_management.Cinema;
 import genre_management.Genre;
@@ -10,7 +11,7 @@ import movie_management.MovieUtils;
 import movie_management.MovieValidator;
 import movie_management.ShowDate;
 import timetable_management.TimeTable;
-
+import seat_management.Seat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -250,7 +251,12 @@ public class SystemClass {
                                         } while (error);
 
                                         // 4. Select the seat
-
+                                        System.out.println("I am Here!");
+                                        Booking booking = new Booking();
+                                        System.out.println(timeTable.getHall().getHallID());
+                                        System.out.println(timeTable.getTimetableID());
+                                        Booking.viewSeat_status(timeTable);
+                                        booking.executeBooking(timeTable);
                                     } else {
                                         back = false;
                                     }

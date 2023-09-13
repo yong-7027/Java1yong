@@ -13,7 +13,7 @@ public class Driver {
     public static void main(String[] args) throws Exception {
 
         Scanner sc = new Scanner(System.in);
-        AdminTimeTable.adminTimeTable(sc);
+        //AdminTimeTable.adminTimeTable(sc);
         //CustomerMovie.customer(sc);
         //AdminMovie.adminMovie(sc);
         //AdminGenre.adminGenre(sc);

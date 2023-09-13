@@ -132,7 +132,7 @@ public class Booking {
         }
 
         ArrayList<Ticket> tickets=Ticket.getBookedTicketList(3);
-        System.out.printf("Movie : %s   Hall : %d   Date : %s   Start Time : %s:%s\n",schedule.getMovie().getMvName(),schedule.getHall().getHallID(),schedule.getShowDate().getDate(),schedule.getStartTime().getHour(),schedule.getStartTime().getMinute());
+        System.out.printf("Movie : %s   Hall : %d   Date : %s   Start Time : %s:%s\n",schedule.getMovie().getMvName().getName(),schedule.getHall().getHallID(),schedule.getShowDate().getDate(),schedule.getStartTime().getHour(),schedule.getStartTime().getMinute());
         System.out.println("\t             [Screen]");
         //System.out.println("   1   2   3   4   5   6   7   8");
         int j=0;
@@ -232,11 +232,17 @@ public class Booking {
         for(Ticket t:tickets){
             System.out.println(t.getSeat().getSeat_id());
         }
+        System.out.println("Cart : ");
         for(Ticket t:cartTicket){
-            System.out.println("cart:\n"+t.getSeat().getSeat_id());
-            System.out.println(t.getTicket_id());
-        }
+            System.out.println("\t\t-----------------------");
+            System.out.printf("\t\t| Ticket id :| %6d |\n",t.getTicket_id());
+            System.out.printf("\t\t| Seat id   :| %6s |\n",t.getSeat().getSeat_id());
 
+//            System.out.println("\tTicket id :"+t.getTicket_id());
+//            System.out.println("Seat id   :"+t.getSeat().getSeat_id());
+
+        }
+        System.out.println("\t\t---------------------");
 
     }
 }

@@ -270,7 +270,7 @@ public class TimeTable implements CrudOperations {
         ResultSet result = null;
         try {
             Object[] params = {hall.getHallID(), String.valueOf(showDate.getDate()), 1};
-            result = DatabaseUtils.selectQueryById("movie_startTime, movie_endTime", "timeTable", "hall_id = ? AND movie_showDate = ? AND timeTable_status = ?", params);
+            result = DatabaseUtils.selectQueryById("schedule_id, movie_startTime, movie_endTime", "timeTable", "hall_id = ? AND movie_showDate = ? AND timeTable_status = ?", params);
         }
         catch (SQLException e) {
             e.printStackTrace();

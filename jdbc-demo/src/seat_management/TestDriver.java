@@ -60,26 +60,26 @@ public class TestDriver {
 //        System.out.println(id);
 //
 //
-//        int i = 1;
-//        int j = 1;
-//        for(int hallid=1;hallid<=4;hallid++){
-//            for(i=1;i<=8;i++){
-//                char letter = (char) ('A' + i - 1); // 将整数 i 转换为字母
-//                for (j=1;j<=8;j++){
-//                    String num = String.valueOf(hallid)+letter + String.valueOf(j); // 将字母和整数 j 拼接成字符串
-//                    System.out.printf("insert into seat(seat_id,hall_id,seatrow,seatcol) value('%s',%d,%d,%d);\n",num,hallid,i,j);
-//                }
-//            }
-//        }
+        int i = 1;
+        int j = 1;
+        for(int hallid=1;hallid<=5;hallid++){
+            for(i=1;i<=8;i++){
+                char letter = (char) ('A' + i - 1); // 将整数 i 转换为字母
+                for (j=1;j<=8;j++){
+                    String num = String.valueOf(hallid)+letter + String.valueOf(j); // 将字母和整数 j 拼接成字符串
+                    System.out.printf("insert into seat(seat_id,hall_id,seatrow,seatcol) value('%s',%d,%d,%d);\n",num,hallid,i,j);
+                }
+            }
+        }
 //        char letter = (char) ('A' + i - 1); // 将整数 i 转换为字母
 //        String num = letter + String.valueOf(j); // 将字母和整数 j 拼接成字符串
 //
 //        System.out.println("结果是：" + num); // 输出结果
 
         Scanner sc = new Scanner(System.in);
-        SystemClass sclass = new SystemClass();
-        sclass.customer(sc);
-        Seat.viewSeat_status(1);
+        //SystemClass sclass = new SystemClass();
+        //sclass.customer(sc);
+       // Seat.viewSeat_status(1);
         Hall hall=new Hall();
         hall.setHallID(1);
         Movie movie = new Movie();
@@ -98,10 +98,10 @@ public class TestDriver {
         //ticket.addTicket();
 
 
-        ArrayList<Ticket> tickets=Ticket.getBookedTicketList(3);
-        for(Ticket t:tickets){
-            System.out.println(t.getSeat().getSeat_id());
-        }
+//        ArrayList<Ticket> tickets=Ticket.getBookedTicketList(3);
+//        for(Ticket t:tickets){
+//            System.out.println(t.getSeat().getSeat_id());
+//        }
 
 
         TimeTable schedule=new TimeTable(3,movie,hall,sd, LocalTime.of(11,0,0));

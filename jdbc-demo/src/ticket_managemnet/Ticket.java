@@ -157,6 +157,8 @@ public class Ticket {
 
         return tickets;
     }
+
+
     public static ArrayList<Ticket> getBookedTicketList(int schedule_id){
         boolean error = false;
         ArrayList<Ticket> tickets = new ArrayList<>();

@@ -25,6 +25,7 @@ public class Booking {
     public Booking() {
         this.childTicket_qty=0;
         this.adultTicket_qty=0;
+        this.totalPrice=0;
     }
 
     public Booking(int booking_id, int adultTicket_qty, int childTicket_qty, double totalPrice, int booking_status) {
@@ -191,75 +192,106 @@ public class Booking {
         ArrayList<Ticket> tickets=Ticket.getBookedTicketList(schedule.getTimetableID());
         ArrayList<Ticket> cartTicket=new ArrayList<>();
         System.out.println("Booking ID : "+this.booking_id);
-        int row,col;
+        int row=0,col=0;
+
         String str=" ";
         char ch=str.charAt(0);
-        int inputType;
-        String ticketType;
 
+        int inputType=0;
+        String ticketType="";
+        double priceRate=0.0;
         int count=0;
+
         while (ch!='N' && ch!='X'){
-            Ticket ticket = new Ticket();
-            System.out.print("\nSelect Row    : ");
-            row = scanner.nextInt();
-            System.out.println(row);/////////////////////
-            System.out.print("Select Column : ");
-            col = scanner.nextInt();
-            System.out.println(col);///////////////////////
-            if(!Seat.checkSeatValidation(row,col)){
-                System.out.println("Invalid Input");
-                continue;
+            boolean validInput=false;
+            while(!validInput) {
+                try {
+                    System.out.print("\nSelect Row    : ");
+                    row = scanner.nextInt();
+                    //System.out.println(row);/////////////////////
+                    System.out.print("Select Column : ");
+                    col = scanner.nextInt();
+                    //System.out.println(col);///////////////////////
+                    if (!Seat.checkSeatValidation(row, col)) {
+                        System.out.println("Invalid Input");
+                        continue;
+                    }else {
+                        validInput=true;
+                    }
+                }catch (Exception e){
+                    System.out.println("Something wrong...");
+                    scanner.nextLine();
+                }
             }
-            System.out.print("Select type(1.Adult 2.Child ) :");
-            inputType=scanner.nextInt();
 
-            if(inputType==1){
-                ticketType="Adult";
-                ticket.setTicketType(ticketType);
-                ticket.setPrice_rate(1.2);
-                this.adultTicket_qty++;
+            do {
+                try {
+                    System.out.print("Select type(1.Adult 2.Child ) :");
+                    inputType = scanner.nextInt();
+                    if (inputType == 1) {
+                        ticketType = "Adult";
+                        priceRate = 1.2;
+                        this.adultTicket_qty++;
 
-            }
-            else if(inputType==2){
-                ticketType="Child";
-                ticket.setTicketType(ticketType);
-                ticket.setPrice_rate(0.8);
-                this.childTicket_qty++;
-            }
+                    } else if (inputType == 2) {
+                        ticketType = "Child";
+                        priceRate = 0.8;
+                        this.childTicket_qty++;
+                    } else {
+                        System.out.println("Invalid Input...\n");
+                    }
+                }catch (Exception e){
+                    System.out.println("something wrong...");
+                    scanner.nextLine();
+                }
+            }while (inputType!=1&&inputType!=2);
             String letter2=Integer.toString(schedule.getHall().getHallID());
             char letter = (char) ('A' + row - 1);
             String combineSeatId =  letter2+letter+Integer.toString(col);
-            //seat
-            Seat seat=new Seat(combineSeatId,schedule.getHall(),row,col,1);
 
-            //Ticket ticket = new Ticket();
-            ticket.setTicket_id(ticket.countTicket_id(count));
-            ticket.setBooking(this);
-            ticket.setSeat(seat);
-            ticket.setTimeTable(schedule);
+            boolean exist=false;
+            for(Ticket t:tickets){
+                if(t.getSeat().getSeat_id().equals(combineSeatId)){
+                    exist=true;
+                    System.out.println("This seat not available/already be booked...");
+                }
+            }
+
+            if(!exist) {
+                //seat
+                Seat seat = new Seat(combineSeatId, schedule.getHall(), row, col, 1);
+                Ticket ticket = new Ticket();
+                ticket.setPrice_rate(priceRate);
+                ticket.setTicketType(ticketType);
+                ticket.setTicket_id(ticket.countTicket_id(count));
+                ticket.setBooking(this);
+                ticket.setSeat(seat);
+                ticket.setTimeTable(schedule);
+                cartTicket.add(ticket);
+            }
 
 
-
-            System.out.print("Continue ? (Y=Yes N=Next X=Exit) : ");
-            str=scanner.next();
+            System.out.print("Continue ? (Y=Yes N=Next) : ");
+            str=scanner.next().toUpperCase();
             ch=str.charAt(0);
-            cartTicket.add(ticket);
+
             count++;
         }
 
-        for(Ticket t:tickets){
-            System.out.println(t.getSeat().getSeat_id());
-        }
-        System.out.println("Cart : ");
+//        for(Ticket t:tickets){
+//            System.out.println(t.getSeat().getSeat_id());
+//        }
+        System.out.println("\nCart : ");
         for(Ticket t:cartTicket){
             System.out.println("\t\t-----------------------");
             System.out.printf("\t\t| Ticket id :| %6d |\n",t.getTicket_id());
             System.out.printf("\t\t| Seat id   :| %6s |\n",t.getSeat().getSeat_id());
             System.out.printf("\t\t| Price     :| %6.2f |\n",t.calculateTicketPrice());
+            this.totalPrice+=t.calculateTicketPrice();
         }
         System.out.println("\t\t-----------------------\n");
-        System.out.println("Confirm This Booking ? (Y=Yes N=No, Select Again E=No Confirm, Exit) : ");
-        str=scanner.next();
+        System.out.println("Confirm This Booking ? (Y=Yes R=No, Select Again N=No Confirm, Exit) : ");
+        str=scanner.next().toUpperCase();
         ch=str.charAt(0);
         if (ch=='Y'){
             Booking.insertBooking(this);

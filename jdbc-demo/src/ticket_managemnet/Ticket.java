@@ -3,6 +3,7 @@ package ticket_managemnet;
 import Connect.DatabaseUtils;
 import booking_management.Booking;
 import hall_management.Hall;
+import movie_management.Movie;
 import seat_management.Seat;
 import timetable_management.TimeTable;
 
@@ -14,20 +15,30 @@ public class Ticket {
     private int ticket_id;
     private Seat seat;
     private Booking booking;
-    //Constructor
-//    public Ticket(int ticket_id, Seat seat, TimeTable timeTable) {
-//        this.ticket_id = ticket_id;
-//        this.seat = seat;
-//        this.timeTable = timeTable;
-//    }
+    private String ticketType;
+    private double price_rate;
 
     public Ticket() {
     }
 
-    public Ticket(int ticket_id, Seat seat, Booking booking) {
+//    public Ticket(int ticket_id, Seat seat, Booking booking) {
+//        this.ticket_id = ticket_id;
+//        this.seat = seat;
+//        this.booking = booking;
+//    }
+    public Ticket(int ticket_id, Seat seat, Booking booking, TimeTable timeTable) {
         this.ticket_id = ticket_id;
         this.seat = seat;
         this.booking = booking;
+        this.timeTable = timeTable;
+    }
+    public Ticket(int ticket_id, Seat seat, Booking booking, String ticketType, double price_rate, TimeTable timeTable) {
+        this.ticket_id = ticket_id;
+        this.seat = seat;
+        this.booking = booking;
+        this.ticketType = ticketType;
+        this.price_rate = price_rate;
+        this.timeTable = timeTable;
     }
 
     private TimeTable timeTable;
@@ -44,6 +55,12 @@ public class Ticket {
     public Booking getBooking() {
         return booking;
     }
+    public String getTicketType() {
+        return ticketType;
+    }
+    public double getPrice_rate() {
+        return price_rate;
+    }
     //Setter
     public void setTicket_id(int ticket_id) {
         this.ticket_id=ticket_id;
@@ -51,7 +68,7 @@ public class Ticket {
     public int countTicket_id(int count) {
         this.ticket_id=1;
         //this.ticket_id = ticket_id;
-        ArrayList<Ticket> tickets=Ticket.getBookedTicketList(3);
+        ArrayList<Ticket> tickets=Ticket.getBookedTicketList();
         for(Ticket t:tickets){
             this.ticket_id++;
         }
@@ -66,6 +83,12 @@ public class Ticket {
     }
     public void setBooking(Booking booking) {
         this.booking = booking;
+    }
+    public void setTicketType(String ticketType) {
+        this.ticketType = ticketType;
+    }
+    public void setPrice_rate(double price_rate) {
+        this.price_rate = price_rate;
     }
 //--------------------------------------------------------------------------------------------------------------------------------
 //    public void addTicket() throws Exception {
@@ -87,23 +110,25 @@ public class Ticket {
 //            System.out.println("\nSomething went wrong!");
 //        }
 //    }
-    public static ArrayList<Ticket> getBookedTicketList(int scheduleId){
+    public static ArrayList<Ticket> getBookedTicketList(){
         boolean error = false;
         ArrayList<Ticket> tickets = new ArrayList<>();
 
         try {
-            Object[] params = {scheduleId};
-            ResultSet result = DatabaseUtils.selectQueryById("*", "ticket", "schedule_id = ?", params);
-            Ticket ticket = null;
+            Object[] params = { };
+            ResultSet result = DatabaseUtils.selectQueryById("*", "ticket",null,null);
+            //Ticket ticket = null;
             while (result.next()) {
-                String typeC="Child";
-                String typeA="Adult";
-                String type= result.getString("ticket_type");
-                if(type.equals(typeC)){
-                    ticket = new ChildTicket("Child");
-                }else{
-                    ticket = new AdultTicket("Adult");
-                }
+//                String typeC="Child";
+//                String typeA="Adult";
+//                String type= result.getString("ticket_type");
+                Ticket ticket = new Ticket();
+//                if(type.equals(typeC)){
+//                    ticket = new ChildTicket("Child");
+//                }else{
+//                    ticket = new AdultTicket("Adult");
+//                }
+                ticket.setTicketType(result.getString("ticket_type"));
                 ticket.setTicket_id(result.getInt("ticket_id"));
                 Seat seat = new Seat();
                 seat.setSeat_id(result.getString("seat_id"));
@@ -117,7 +142,7 @@ public class Ticket {
                 timetable.setTimetableID(result.getInt("schedule_id"));
                 ticket.setBooking(booking);
                 //ticket.timeTable.setTimetableID(result.getInt("schedule_id"));
-
+                ticket.setPrice_rate(result.getDouble("price_rate"));
                 tickets.add(ticket);
 
                 //seats.add(seat);
@@ -132,5 +157,75 @@ public class Ticket {
 
         return tickets;
     }
+    public static ArrayList<Ticket> getBookedTicketList(int schedule_id){
+        boolean error = false;
+        ArrayList<Ticket> tickets = new ArrayList<>();
 
+        try {
+            Object[] params = {schedule_id};
+            ResultSet result = DatabaseUtils.selectQueryById("*", "ticket","schedule_id = ?",params);
+            //Ticket ticket = null;
+            while (result.next()) {
+//                String typeC="Child";
+//                String typeA="Adult";
+//                String type= result.getString("ticket_type");
+                Ticket ticket = new Ticket();
+//                if(type.equals(typeC)){
+//                    ticket = new ChildTicket("Child");
+//                }else{
+//                    ticket = new AdultTicket("Adult");
+//                }
+                ticket.setTicketType(result.getString("ticket_type"));
+                ticket.setTicket_id(result.getInt("ticket_id"));
+                Seat seat = new Seat();
+                seat.setSeat_id(result.getString("seat_id"));
+                ticket.setSeat(seat);
+                //ticket.seat.setSeat_id(result.getString("seat_id"));
+                Booking booking =new Booking();
+                booking.setBooking_id(result.getInt("booking_id"));
+                ticket.setBooking(booking);
+                //ticket.booking.setBooking_id(result.getInt("booking_id"));
+                TimeTable timetable=new TimeTable();
+                timetable.setTimetableID(result.getInt("schedule_id"));
+                ticket.setBooking(booking);
+                //ticket.timeTable.setTimetableID(result.getInt("schedule_id"));
+                ticket.setPrice_rate(result.getDouble("price_rate"));
+                tickets.add(ticket);
+
+                //seats.add(seat);
+            }
+
+            result.close();
+            //resultHall.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return tickets;
+    }
+    public static void insertTicket(Ticket ticket) throws Exception {
+        int rowAffected = 0;
+
+        try {
+            String insertSql = "INSERT INTO `ticket` (`ticket_id`,`booking_id`,`seat_id`,`schedule_id`,`ticket_type`,`price_rate`) value(?,?,?,?,?,?);";
+            Object[] params = {ticket.getTicket_id(),ticket.getBooking().getBooking_id(),ticket.getSeat().getSeat_id(),ticket.timeTable.getTimetableID(),ticket.getTicketType(),ticket.getPrice_rate()};
+            rowAffected = DatabaseUtils.insertQuery(insertSql, params);
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (rowAffected > 0) {
+            System.out.println("\nTicket successfully added...");
+        }
+        else {
+            System.out.println("\nSomething went wrong!");
+        }
+    }
+    public double calculateTicketPrice(){
+        return this.timeTable.getMovie().getBasicTicketPrice()*this.price_rate;
+        //return movie.getBasicTicketPrice()*this.price_rate;
+
+    }
 }

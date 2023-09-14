@@ -7,8 +7,7 @@ import booking_management.Booking;
 import hall_management.Hall;
 import movie_management.Movie;
 import movie_management.ShowDate;
-import ticket_managemnet.AdultTicket;
-import ticket_managemnet.ChildTicket;
+
 import ticket_managemnet.Ticket;
 import timetable_management.TimeTable;
 
@@ -94,7 +93,7 @@ public class TestDriver {
         //newseat.addSeat();
         Booking booking=new Booking(1,0,0,0,1);
 //        booking.addBooking();
-        AdultTicket ticket=new AdultTicket(3,newseat,booking,"Adult");
+        //AdultTicket ticket=new AdultTicket(3,newseat,booking,"Adult");
         //ticket.addTicket();
 
 
@@ -104,7 +103,7 @@ public class TestDriver {
 //        }
 
 
-        TimeTable schedule=new TimeTable(3,movie,hall,sd, LocalTime.of(11,0,0));
+        TimeTable schedule=new TimeTable(4,movie,hall,sd, LocalTime.of(11,0,0));
 
 //---------Start here----------------------------------------------------------------------------------------------------------------------
         Booking.viewSeat_status(schedule);

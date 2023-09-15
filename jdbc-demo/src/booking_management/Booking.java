@@ -200,7 +200,7 @@ public class Booking {
         int inputType=0;
         String ticketType="";
         double priceRate=0.0;
-        int count=0;
+        int count=1;
 
         while (ch!='N' && ch!='X'){
             boolean validInput=false;

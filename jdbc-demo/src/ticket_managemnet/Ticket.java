@@ -133,7 +133,7 @@ public class Ticket {
                 Seat seat = new Seat();
                 seat.setSeat_id(result.getString("seat_id"));
                 ticket.setSeat(seat);
-                //ticket.seat.setSeat_id(result.getString("seat_id"));
+
                 Booking booking =new Booking();
                 booking.setBooking_id(result.getInt("booking_id"));
                 ticket.setBooking(booking);

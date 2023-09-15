@@ -2,8 +2,11 @@ package hall_management;
 
 import Connect.DatabaseUtils;
 import Driver.Name;
+import seat_management.Seat;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -13,6 +16,15 @@ public class Hall {
     private String hallType;
     private int hallCapacity;
     private int status;
+
+    private ArrayList<Seat> seats;
+    public ArrayList<Seat> getSeats() {
+        return seats;
+    }
+
+    public void setSeats(ArrayList<Seat> seats) {
+        this.seats = seats;
+    }
 
     // Constructor
     public Hall(){
@@ -60,6 +72,8 @@ public class Hall {
                 System.out.println(count + ". Hall Type: " + getHallType() + " HALL");
                 count++;
                 System.out.println(count + ". Hall Capacity: " + getHallCapacity() + " (cannot be modified)");
+                count++;
+                System.out.println(count + ". Manage Seats Status");
 
                 System.out.print("\nEnter the serial number of the hall information you want to change (0 - Stop): ");
                 int serialNum = sc.nextInt();
@@ -152,4 +166,83 @@ public class Hall {
     public int getStatus() {
         return status;
     }
+
+
+
+    //ChinYong Part
+    //init the hall's seat from database
+    public void initSeatList() throws SQLException {
+        ArrayList<Seat> seats = new ArrayList<>();
+
+        try {
+            Object[] params = {this.hallID};
+            ResultSet result = DatabaseUtils.selectQueryById("*", "seat", "hall_id = ?", params);
+
+            while (result.next()) {
+                Seat seat = new Seat();
+
+                seat.setSeat_id(result.getString("seat_id"));
+                //seat.hall.setHallID(hallId);
+                seat.setSeatRow(result.getInt("seatrow"));
+                seat.setSeatCol(result.getInt("seatcol"));
+                seat.setSeat_status(result.getInt("seat_status"));
+
+                seats.add(seat);
+
+            }
+
+            result.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        this.setSeats(seats);
+
+    }
+
+    public void viewSeat_status() {
+        boolean error = false;
+
+        int largestRow=0;
+        int largestCol=0;
+
+        for(Seat seats:this.getSeats()){
+            largestRow=seats.getSeatRow();
+            largestCol=seats.getSeatCol();
+        }
+
+
+        System.out.println("\t\t\t1\t\t2\t\t3\t\t4\t\t5\t\t6\t\t7\t\t8");
+        int j=0;
+        for(int i=1;i<=largestRow;i++) {
+            System.out.printf("\t\t");
+            char letter = (char) ('A' + i - 1);
+            System.out.print(letter+" ");
+            do {
+                char st;
+                if(seats.get(j).getSeat_status()==1) {
+                    st='O';
+                }else{
+                    st='X';
+                }
+
+                System.out.printf("[%s]:%c ",seats.get(j).getSeat_id(),st);
+                j++;
+            } while (seats.get(j).getSeatCol()+1 <= largestCol);
+            char st;
+            if(seats.get(j).getSeat_status()==1) {
+                st='O';
+            }else{
+                st='X';
+            }
+            System.out.printf("[%s]:%c ",seats.get(j).getSeat_id(),st);
+            System.out.printf("\n");
+            j += 1;
+        }
+        System.out.printf("\nO = Available/intact and undamaged\tX = Unavailable/damaged");
+        //return 0;
+    }
+
+
+
 }

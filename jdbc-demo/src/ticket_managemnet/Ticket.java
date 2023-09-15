@@ -17,8 +17,10 @@ public class Ticket {
     private Booking booking;
     private String ticketType;
     private double price_rate;
+    private int ticketStatus;
 
     public Ticket() {
+        this.ticketStatus=1;
     }
 
 //    public Ticket(int ticket_id, Seat seat, Booking booking) {
@@ -31,6 +33,7 @@ public class Ticket {
         this.seat = seat;
         this.booking = booking;
         this.timeTable = timeTable;
+        this.ticketStatus=1;
     }
     public Ticket(int ticket_id, Seat seat, Booking booking, String ticketType, double price_rate, TimeTable timeTable) {
         this.ticket_id = ticket_id;
@@ -75,6 +78,15 @@ public class Ticket {
         this.ticket_id+=count;
         return this.ticket_id;
     }
+
+    public void setTicketStatus(int ticketStatus) {
+        this.ticketStatus = ticketStatus;
+    }
+
+    public int getTicketStatus() {
+        return ticketStatus;
+    }
+
     public void setSeat(Seat seat) {
         this.seat = seat;
     }
@@ -210,8 +222,8 @@ public class Ticket {
         int rowAffected = 0;
 
         try {
-            String insertSql = "INSERT INTO `ticket` (`ticket_id`,`booking_id`,`seat_id`,`schedule_id`,`ticket_type`,`price_rate`) value(?,?,?,?,?,?);";
-            Object[] params = {ticket.getTicket_id(),ticket.getBooking().getBooking_id(),ticket.getSeat().getSeat_id(),ticket.timeTable.getTimetableID(),ticket.getTicketType(),ticket.getPrice_rate()};
+            String insertSql = "INSERT INTO `ticket` (`ticket_id`,`booking_id`,`seat_id`,`schedule_id`,`ticket_type`,`price_rate`,`ticket_status`) value(?,?,?,?,?,?,?);";
+            Object[] params = {ticket.getTicket_id(),ticket.getBooking().getBooking_id(),ticket.getSeat().getSeat_id(),ticket.timeTable.getTimetableID(),ticket.getTicketType(),ticket.getPrice_rate(),ticket.getTicketStatus()};
             rowAffected = DatabaseUtils.insertQuery(insertSql, params);
         }
         catch (SQLException e) {

@@ -283,7 +283,7 @@ public class Booking {
                     Ticket ticket = new Ticket();
                     ticket.setPrice_rate(priceRate);
                     ticket.setTicketType(ticketType);
-                    ticket.setTicket_id(ticket.countTicket_id(count));
+                    ticket.setTicket_id(ticket.countTicket_id(count+1));
                     ticket.setBooking(this);
                     ticket.setSeat(seat);
                     ticket.setTimeTable(schedule);

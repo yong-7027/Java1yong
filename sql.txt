@@ -458,6 +458,7 @@ create table ticket(
     schedule_id int(255),
     ticket_type varchar(25),
     price_rate decimal(11,2),
+    ticket_status int(11) NOT NULL DEFAULT 1,
     primary key(ticket_id),
 	FOREIGN KEY(seat_id) REFERENCES seat(seat_id),
 	FOREIGN KEY(schedule_id) REFERENCES timetable(schedule_id)

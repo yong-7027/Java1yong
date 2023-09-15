@@ -238,11 +238,10 @@ public class SystemClass {
                                             }
                                         } while (error);
 
-                                        // 4. Select the seat
-                                        System.out.println("I am Here!");
+                                        // 4. Select the seat chin yong part
                                         Booking booking = new Booking();
-                                        System.out.println(timeTable.getHall().getHallID());
-                                        System.out.println(timeTable.getTimetableID());
+                                        //System.out.println(timeTable.getHall().getHallID());
+                                        System.out.println("Time table id : "+timeTable.getTimetableID());
                                         Booking.viewSeat_status(timeTable);
                                         booking.executeBooking(timeTable);
                                     } else {

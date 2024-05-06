@@ -7,7 +7,7 @@ CREATE TABLE `cinema` (
   PRIMARY KEY(cinema_id),
   CONSTRAINT CHK_CINEMA_STATUS CHECK (CINEMA_STATUS IN (0, 1))
 );
-
+ss
 INSERT INTO `cinema` (`cinema_id`, `cinema_name`, `cinema_address`, `cinema_phone`, `cinema_status`) VALUES
 (1, 'GRC Johor Bahru', '108, JALAN WONG FOOK, 10050 GEORGE TOWN, PENANG', '08-98765432', 1),
 (2, 'GRC Penang', '27, JALAN BATU 2, 64000 KUALA LUMPUR, SELANGOR', '08-98965432', 1);
